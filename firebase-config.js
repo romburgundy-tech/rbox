@@ -11,4 +11,4 @@ export const firebaseConfig = {
 
 // The URL of your deployed Cloudflare Worker (see /worker/recipe-worker.js and README.md).
 // Example: "https://recipe-box-worker.yourname.workers.dev"
-export const WORKER_URL = "https://YOUR-WORKER-SUBDOMAIN.workers.dev";
+export const WORKER_URL = "recipe-box-worker.romburgundy.workers.dev";
