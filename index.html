@@ -332,10 +332,18 @@ function dataUrlParts(dataUrl){
 }
 
 /* ---------------- Talk to the Cloudflare Worker (keeps the API key secret) ---------------- */
+async function authHeader(){
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not signed in yet — give it a second and try again.');
+  const token = await user.getIdToken();
+  return { 'Authorization': 'Bearer ' + token };
+}
+
 async function extractFromUrl(url){
+  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
   const res = await fetch(WORKER_URL + '/extract-url', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers,
     body: JSON.stringify({ url })
   });
   const data = await res.json();
@@ -344,9 +352,10 @@ async function extractFromUrl(url){
 }
 async function extractFromImage(dataUrl){
   const { mediaType, data } = dataUrlParts(dataUrl);
+  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
   const res = await fetch(WORKER_URL + '/extract-image', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers,
     body: JSON.stringify({ mediaType, data })
   });
   const result = await res.json();
@@ -630,9 +639,10 @@ async function handleExtract(){
 }
 
 async function extractFromText(text){
+  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
   const res = await fetch(WORKER_URL + '/extract-text', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers,
     body: JSON.stringify({ text })
   });
   const data = await res.json();
