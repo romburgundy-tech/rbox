@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recipe Box">
+<meta name="theme-color" content="#F7F2E7">
+<meta name="description" content="A shared family recipe box.">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/favicon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<title>The Recipe Box</title>
+<style>
+  :root{
+    --parchment:#F7F2E7;
+    --card:#FFFCF6;
+    --ink:#2B2318;
+    --ink-soft:#6B6152;
+    --sage:#5C6E48;
+    --sage-dark:#465538;
+    --jam:#A2392F;
+    --line:#E3D9C4;
+    --line-strong:#CDBF9F;
+    --gold:#C89B3C;
+    --radius:18px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--parchment);color:var(--ink);font-family:'Inter',sans-serif;}
+  body{
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(43,35,24,0.055) 1px, transparent 0);
+    background-size: 18px 18px;
+  }
+  #app{max-width:520px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:calc(78px + var(--safe-b));}
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em;}
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea{font-family:inherit;}
+  a{color:var(--sage-dark);}
+
+  /* ---- Header ---- */
+  .topbar{
+    padding:calc(20px + var(--safe-t)) 20px 14px;
+    display:flex;align-items:flex-end;justify-content:space-between;
+  }
+  .topbar .brand h1{font-size:28px;font-weight:600;color:var(--ink);}
+  .topbar .brand .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
+  .iconbtn{
+    width:38px;height:38px;border-radius:50%;border:1px solid var(--line-strong);
+    background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink);
+    flex-shrink:0;
+  }
+  .iconbtn:active{transform:scale(0.94);}
+
+  /* ---- Search & filters ---- */
+  .searchwrap{padding:0 20px 12px;}
+  .search{
+    display:flex;align-items:center;gap:8px;background:var(--card);
+    border:1px solid var(--line-strong);border-radius:12px;padding:10px 14px;
+  }
+  .search input{border:none;background:transparent;outline:none;flex:1;font-size:15px;color:var(--ink);}
+  .search input::placeholder{color:#A79C86;}
+  .chiprow{display:flex;gap:8px;overflow-x:auto;padding:2px 20px 14px;scrollbar-width:none;}
+  .chiprow::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0;padding:7px 14px;border-radius:999px;border:1px solid var(--line-strong);
+    background:var(--card);font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.03em;
+  }
+  .chip.active{background:var(--sage);border-color:var(--sage);color:#fff;}
+
+  /* ---- Recipe list ---- */
+  .list{padding:4px 20px 20px;display:flex;flex-direction:column;gap:12px;}
+  .rcard{
+    position:relative;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:14px;display:flex;gap:13px;align-items:center;
+    box-shadow:0 1px 0 rgba(43,35,24,0.03);
+  }
+  .rcard:active{background:#FBF6EC;}
+  .punch{
+    position:absolute;top:14px;left:-6px;width:12px;height:12px;border-radius:50%;
+    background:var(--parchment);border:1px solid var(--line-strong);
+  }
+  .rthumb{
+    width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0;background:#EFE7D4;
+    border:1px solid var(--line);
+  }
+  .rthumb.placeholder{display:flex;align-items:center;justify-content:center;color:var(--line-strong);}
+  .rinfo{min-width:0;flex:1;}
+  .rinfo h3{font-size:17.5px;font-weight:600;line-height:1.22;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .rmeta{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);margin-top:5px;text-transform:uppercase;letter-spacing:0.04em;}
+  .chev{color:var(--line-strong);flex-shrink:0;}
+
+  .empty{padding:60px 30px;text-align:center;color:var(--ink-soft);}
+  .empty h3{font-size:19px;margin-bottom:8px;color:var(--ink);}
+  .empty p{font-size:14px;line-height:1.5;margin:0;}
+
+  /* ---- Tab bar ---- */
+  .tabbar{
+    position:fixed;bottom:0;left:0;right:0;
+    max-width:520px;margin:0 auto;
+    background:rgba(247,242,231,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line-strong);
+    display:flex;padding:9px 8px calc(9px + var(--safe-b));
+  }
+  .tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;color:var(--ink-soft);padding:5px 0;
+  }
+  .tab.active{color:var(--sage-dark);}
+  .tab span{font-size:10.5px;font-weight:600;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.03em;}
+
+  /* ---- Detail / Add views ---- */
+  .screen{padding:0 0 30px;}
+  .screenhead{
+    display:flex;align-items:center;gap:10px;padding:calc(16px + var(--safe-t)) 20px 10px;
+  }
+  .screenhead h2{font-size:20px;font-weight:600;flex:1;}
+
+  .photohero{width:100%;aspect-ratio:4/3;object-fit:cover;background:#EFE7D4;border-bottom:1px solid var(--line);}
+  .photohero.placeholder{display:flex;align-items:center;justify-content:center;color:#C9BC9D;}
+  .detailbody{padding:20px;}
+  .detailbody h1{font-size:26px;line-height:1.15;margin-bottom:8px;}
+  .metaline{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:20px;display:flex;gap:14px;flex-wrap:wrap;}
+  .metaline a{color:var(--sage-dark);text-decoration:none;border-bottom:1px dashed var(--sage);}
+  .sectionlabel{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-dark);font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+  .sectionlabel::after{content:"";flex:1;height:1px;background:var(--line-strong);}
+  .ingline{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;}
+  .ingline:last-child{border-bottom:none;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:8px;flex-shrink:0;}
+  .stepline{display:flex;gap:12px;padding:10px 0;font-size:15px;line-height:1.55;border-bottom:1px solid var(--line);}
+  .stepline:last-child{border-bottom:none;}
+  .stepnum{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--jam);flex-shrink:0;width:22px;}
+
+  .actionrow{display:flex;gap:10px;margin-top:24px;}
+  .btn{
+    border-radius:12px;padding:13px 16px;font-size:14.5px;font-weight:600;border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .btn.primary{background:var(--sage);border-color:var(--sage);color:#fff;}
+  .btn.danger{background:transparent;border-color:var(--jam);color:var(--jam);}
+  .btn:active{transform:scale(0.97);}
+  .btn:disabled{opacity:0.5;}
+
+  /* ---- Forms ---- */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);margin-bottom:7px;font-weight:600;}
+  .field input[type=text], .field input[type=url], .field textarea{
+    width:100%;border:1px solid var(--line-strong);background:var(--card);border-radius:10px;
+    padding:12px 13px;font-size:15px;color:var(--ink);outline:none;
+  }
+  .field textarea{resize:vertical;min-height:110px;line-height:1.5;}
+  .field .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
+  .urlrow{display:flex;gap:8px;}
+  .urlrow input{flex:1;}
+  .urlrow button{
+    background:var(--sage);color:#fff;border:none;border-radius:10px;padding:0 16px;font-weight:600;font-size:13.5px;
+  }
+  .urlrow button:disabled{opacity:0.5;}
+
+  .photopicker{display:flex;gap:10px;margin-bottom:16px;}
+  .photoopt{
+    flex:1;border-radius:12px;border:2px solid var(--line);overflow:hidden;position:relative;aspect-ratio:1;background:#EFE7D4;
+  }
+  .photoopt.selected{border-color:var(--sage);}
+  .photoopt img{width:100%;height:100%;object-fit:cover;}
+  .photoopt .lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(43,35,24,0.68);color:#fff;font-size:10.5px;text-align:center;padding:5px 0;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.04em;}
+  .photoopt.empty{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-direction:column;gap:6px;font-size:12px;border-style:dashed;}
+  .photoopt input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+  .status{padding:14px;border-radius:12px;background:#EFE9D8;font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:10px;margin-bottom:16px;line-height:1.4;}
+  .status.error{background:#F5DEDB;color:#8A3128;}
+  .spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.15);border-top-color:var(--sage-dark);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---- Onboarding ---- */
+  .onboard{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:30px;}
+  .onboard .mark{font-family:'Fraunces',serif;font-size:38px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
+  .marklogo{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+  .onboard .sub{color:var(--ink-soft);font-size:15px;line-height:1.5;margin-bottom:30px;}
+  .onboard input{width:100%;border:1px solid var(--line-strong);background:var(--card);border-radius:12px;padding:15px;font-size:16px;margin-bottom:14px;outline:none;}
+  .onboard button{width:100%;background:var(--sage);color:#fff;border:none;border-radius:12px;padding:15px;font-weight:600;font-size:15.5px;}
+  .onboard button:disabled{opacity:0.5;}
+
+  /* ---- Me / share modal ---- */
+  .mecard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:0 20px 16px;}
+  .mecard .name{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+  .mecard .role{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+  .infoblock{margin:0 20px 16px;padding:16px 18px;background:#EFE9D8;border-radius:14px;font-size:13.5px;line-height:1.55;color:#4a4335;}
+  .infoblock b{color:var(--ink);}
+
+  .modalbg{position:fixed;inset:0;background:rgba(43,35,24,0.5);display:flex;align-items:flex-end;z-index:50;}
+  .modal{background:var(--card);width:100%;max-width:520px;margin:0 auto;border-radius:20px 20px 0 0;padding:22px 20px calc(24px + var(--safe-b));max-height:80vh;overflow-y:auto;}
+  .modal h3{font-size:18px;margin-bottom:12px;}
+  .modal textarea{width:100%;min-height:180px;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-size:13.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;color:var(--ink);background:#FBF6EC;}
+
+  .toplink{display:flex;align-items:center;gap:6px;color:var(--sage-dark);font-size:13.5px;font-weight:600;background:none;border:none;padding:4px 0;}
+</style>
+
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+import { firebaseConfig, WORKER_URL } from './firebase-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage, ref, uploadString, getDownloadURL, deleteObject
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+/* ---------------- Icons ---------------- */
+const ICON = {
+  search:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
+  chevron:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`,
+  back:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
+  book:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  plus:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  user:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  pot:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-1.2 8.4A2 2 0 0 1 16.8 20H7.2a2 2 0 0 1-2-1.6L4 10z"/><path d="M2 10h20M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
+  camera:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+  share:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>`,
+  pencil:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`,
+  trash:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`,
+  wand:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M3 21l9-9M12.2 6.2L11 5"/></svg>`,
+};
+
+/* ---------------- State ---------------- */
+let state = {
+  loading: true,
+  authReady: false,
+  profile: null,
+  view: 'list',
+  filter: 'all',
+  query: '',
+  recipes: [],          // live array from Firestore
+  detail: null,
+  editingId: null,
+  form: null,
+  extractStatus: null,
+  saving: false,
+  shareModal: null,
+};
+
+function render(){ document.getElementById('app').innerHTML = viewFor(state); }
+
+/* ---------------- Profile (local to this device) ---------------- */
+function loadProfile(){
+  try{ const v = localStorage.getItem('recipebox_profile'); return v ? JSON.parse(v) : null; }
+  catch(e){ return null; }
+}
+function saveProfile(p){ localStorage.setItem('recipebox_profile', JSON.stringify(p)); }
+
+/* ---------------- Firestore live sync ---------------- */
+function startRecipeSync(){
+  const q = query(collection(db, 'recipes'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, snap => {
+    state.recipes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    state.loading = false;
+    if (state.view === 'detail' && state.detail){
+      const updated = state.recipes.find(r => r.id === state.detail.id);
+      if (updated) state.detail = updated;
+    }
+    render();
+  }, err => {
+    console.error(err);
+    state.loading = false;
+    render();
+  });
+}
+
+/* ---------------- Boot ---------------- */
+onAuthStateChanged(auth, user => {
+  if (user){
+    state.authReady = true;
+    state.profile = loadProfile();
+    startRecipeSync();
+    render();
+  }
+});
+signInAnonymously(auth).catch(err => {
+  console.error('Auth failed', err);
+  state.loading = false;
+  state.authError = 'Could not connect. Check your Firebase setup in firebase-config.js.';
+  render();
+});
+render();
+
+/* ---------------- Utilities ---------------- */
+function uid(){ return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return ''; } }
+
+function resizeImageFile(file, maxW=1000, quality=0.72){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxW){ h = Math.round(h * (maxW/w)); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function dataUrlParts(dataUrl){
+  const m = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+  return { mediaType: m[1], data: m[2] };
+}
+
+/* ---------------- Talk to the Cloudflare Worker (keeps the API key secret) ---------------- */
+async function extractFromUrl(url){
+  const res = await fetch(WORKER_URL + '/extract-url', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ url })
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Could not read that page.');
+  return data;
+}
+async function extractFromImage(dataUrl){
+  const { mediaType, data } = dataUrlParts(dataUrl);
+  const res = await fetch(WORKER_URL + '/extract-image', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ mediaType, data })
+  });
+  const result = await res.json();
+  if (!res.ok || result.error) throw new Error(result.error || 'Could not read that photo.');
+  return result;
+}
+
+/* ---------------- Photo storage (Firebase Storage) ---------------- */
+async function uploadOwnPhoto(id, dataUrl){
+  const r = ref(storage, `recipes/${id}/own.jpg`);
+  await uploadString(r, dataUrl, 'data_url');
+  return await getDownloadURL(r);
+}
+async function deleteOwnPhoto(id){
+  try{ await deleteObject(ref(storage, `recipes/${id}/own.jpg`)); }catch(e){}
+}
+
+/* ---------------- Views ---------------- */
+function viewFor(s){
+  if (s.authError) return `<div style="padding:60px 30px;text-align:center;color:var(--jam);">${esc(s.authError)}</div>`;
+  if (s.loading) return `<div style="padding:60px;text-align:center;color:var(--ink-soft);">Opening the recipe box…</div>`;
+  if (!s.profile) return onboardView();
+  let body = '';
+  if (s.view === 'list') body = listView(s);
+  else if (s.view === 'add') body = addView(s);
+  else if (s.view === 'detail') body = detailView(s);
+  else if (s.view === 'me') body = meView(s);
+  return body + tabBar(s) + (s.shareModal ? shareModal(s) : '');
+}
+
+function onboardView(){
+  return `
+  <div class="onboard">
+    <div class="mark"><img src="icons/mark-96.png" alt="" class="marklogo"> The Recipe Box</div>
+    <div class="sub">A shared box of family recipes. Add what you know by first name — everyone who opens this site sees what everyone adds.</div>
+    <input id="nameInput" type="text" placeholder="Your first name" autocomplete="given-name">
+    <button id="startBtn" disabled>Open the box</button>
+  </div>`;
+}
+
+function tabBar(s){
+  const tab = (key, icon, label) => `<button class="tab ${s.view===key?'active':''}" data-tab="${key}">${icon}<span>${label}</span></button>`;
+  return `<div class="tabbar">
+    ${tab('list', ICON.book, 'Recipes')}
+    ${tab('add', ICON.plus, 'Add')}
+    ${tab('me', ICON.user, 'Me')}
+  </div>`;
+}
+
+function listView(s){
+  const q = s.query.trim().toLowerCase();
+  const others = [...new Set(s.recipes.map(r => r.addedBy).filter(n => n && n !== s.profile.name))].sort();
+  let items = s.recipes.slice();
+  if (s.filter === 'mine') items = items.filter(r => r.addedBy === s.profile.name);
+  else if (s.filter !== 'all') items = items.filter(r => r.addedBy === s.filter);
+  if (q) items = items.filter(r => (r.title||'').toLowerCase().includes(q));
+
+  const chips = [
+    `<button class="chip ${s.filter==='all'?'active':''}" data-filter="all">All</button>`,
+    `<button class="chip ${s.filter==='mine'?'active':''}" data-filter="mine">Mine</button>`,
+    ...others.map(n => `<button class="chip ${s.filter===n?'active':''}" data-filter="${esc(n)}">${esc(n)}</button>`)
+  ].join('');
+
+  const list = items.length ? items.map(r => {
+    const thumb = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
+    return `
+    <div class="rcard" data-open="${r.id}">
+      <div class="punch"></div>
+      ${thumb ? `<img class="rthumb" src="${esc(thumb)}" onerror="this.outerHTML='<div class=&quot;rthumb placeholder&quot;>${ICON.pot}</div>'">`
+                    : `<div class="rthumb placeholder">${ICON.pot}</div>`}
+      <div class="rinfo">
+        <h3>${esc(r.title)}</h3>
+        <div class="rmeta">${esc(r.addedBy)} · ${fmtDate(r.createdAt)}</div>
+      </div>
+      <div class="chev">${ICON.chevron}</div>
+    </div>`;
+  }).join('') : `<div class="empty"><h3>Nothing here yet</h3><p>${q ? 'No recipes match your search.' : 'Recipes added here will show up for the whole family.'}</p></div>`;
+
+  return `
+  <div class="topbar">
+    <div class="brand"><h1>The Recipe Box</h1><div class="tag">${s.recipes.length} recipe${s.recipes.length===1?'':'s'} in the family box</div></div>
+  </div>
+  <div class="searchwrap"><div class="search">${ICON.search}<input id="searchInput" type="text" placeholder="Search recipes by title…" value="${esc(s.query)}"></div></div>
+  <div class="chiprow">${chips}</div>
+  <div class="list">${list}</div>`;
+}
+
+function detailView(s){
+  const r = s.detail;
+  if (!r) return `<div class="screenhead"><button class="iconbtn" data-back="list">${ICON.back}</button><h2>Loading…</h2></div>`;
+  const photo = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
+  const isMine = r.addedBy === s.profile.name;
+  const canSwitch = r.sourceImageUrl && r.ownPhotoUrl;
+
+  return `
+  <div class="screenhead" style="position:absolute;top:0;left:0;right:0;z-index:5;">
+    <button class="iconbtn" data-back="list" style="background:rgba(255,255,255,0.9);">${ICON.back}</button>
+    <div style="flex:1;"></div>
+    <button class="iconbtn" data-action="share" style="background:rgba(255,255,255,0.9);">${ICON.share}</button>
+  </div>
+  ${photo ? `<img class="photohero" src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;photohero placeholder&quot;>${ICON.pot}</div>'">`
+          : `<div class="photohero placeholder">${ICON.pot}</div>`}
+  <div class="detailbody">
+    <h1>${esc(r.title)}</h1>
+    <div class="metaline">
+      <span>Added by ${esc(r.addedBy)} · ${fmtDate(r.createdAt)}</span>
+      ${r.sourceUrl ? `<a href="${esc(r.sourceUrl)}" target="_blank" rel="noopener">Original recipe ↗</a>` : ''}
+    </div>
+
+    ${canSwitch ? `
+    <div class="chiprow" style="padding:0 0 4px;">
+      <button class="chip ${r.chosenPhoto==='source'?'active':''}" data-switchphoto="source">Website photo</button>
+      <button class="chip ${r.chosenPhoto==='own'?'active':''}" data-switchphoto="own">My photo</button>
+    </div>` : ''}
+
+    <div class="sectionlabel">Ingredients</div>
+    ${(r.ingredients||[]).map(i => `<div class="ingline"><div class="dot"></div><div>${esc(i)}</div></div>`).join('') || `<div style="color:var(--ink-soft);font-size:14px;">No ingredients listed.</div>`}
+
+    <div class="sectionlabel">Instructions</div>
+    ${(r.instructions||[]).map((i,idx) => `<div class="stepline"><div class="stepnum">${idx+1}</div><div>${esc(i)}</div></div>`).join('') || `<div style="color:var(--ink-soft);font-size:14px;">No instructions listed.</div>`}
+
+    ${isMine ? `
+    <div class="actionrow">
+      <button class="btn" data-action="edit">${ICON.pencil} Edit</button>
+      <button class="btn danger" data-action="delete">${ICON.trash} Delete</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function addView(s){
+  const f = s.form;
+  const status = s.extractStatus;
+  return `
+  <div class="screenhead">
+    <button class="iconbtn" data-back="list">${ICON.back}</button>
+    <h2>${s.editingId ? 'Edit recipe' : 'Add a recipe'}</h2>
+  </div>
+  <div class="detailbody" style="padding-top:4px;">
+    ${!s.editingId ? `
+    <div class="field">
+      <label>Paste a recipe link</label>
+      <div class="urlrow">
+        <input id="urlInput" type="url" placeholder="https://…" value="${esc(f.sourceUrl||'')}">
+        <button id="extractBtn" ${status && status.type==='loading' ? 'disabled' : ''}>${ICON.wand} Extract</button>
+      </div>
+      <div class="hint">Pulls out just the ingredients &amp; steps — skips the life story.</div>
+    </div>
+    <div class="field">
+      <label>Or scan a handwritten recipe</label>
+      <button class="btn" id="scanBtn" style="width:100%;position:relative;overflow:hidden;" ${status && status.type==='loading' ? 'disabled' : ''}>
+        ${ICON.camera} Scan a recipe card or note
+        <input type="file" accept="image/*" capture="environment" id="scanInput" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+      </button>
+      <div class="hint">Take a photo of a recipe card or handwritten note — it'll be read and typed up automatically, and the photo becomes this recipe's picture.</div>
+    </div>
+    <div class="field">
+      <label>Or paste recipe text — great for Instagram &amp; TikTok captions</label>
+      <textarea id="pasteInput" placeholder="Paste a caption or any recipe text here…"></textarea>
+      <button class="btn" id="pasteExtractBtn" style="width:100%;margin-top:8px;" ${status && status.type==='loading' ? 'disabled' : ''}>${ICON.wand} Extract from text</button>
+      <div class="hint">Instagram &amp; TikTok reels usually can't be read directly, but the recipe is almost always in the caption — copy it from the app, paste it here, then add your own photo below.</div>
+    </div>` : ''}
+
+    ${status ? `<div class="status ${status.type==='error'?'error':''}">${status.type==='loading' ? '<div class="spinner"></div>' : ''} ${esc(status.msg)}</div>` : ''}
+
+    <div class="field">
+      <label>Title</label>
+      <input id="titleInput" type="text" placeholder="Grandma's Sunday Sauce" value="${esc(f.title||'')}">
+    </div>
+
+    <div class="field">
+      <label>Photo</label>
+      <div class="photopicker">
+        ${f.sourceImageUrl ? `
+        <div class="photoopt ${f.chosenPhoto==='source'?'selected':''}" data-choosephoto="source">
+          <img src="${esc(f.sourceImageUrl)}"><div class="lbl">From website</div>
+        </div>` : ''}
+        <div class="photoopt ${f.chosenPhoto==='own'?'selected':''} ${!f.ownPhotoDataUrl?'empty':''}" ${f.ownPhotoDataUrl?'data-choosephoto="own"':''}>
+          ${f.ownPhotoDataUrl ? `<img src="${f.ownPhotoDataUrl}"><div class="lbl">My photo</div>` : `${ICON.camera}<span>Add my photo</span><input type="file" accept="image/*" id="photoInput">`}
+        </div>
+      </div>
+      ${f.ownPhotoDataUrl ? `<button class="toplink" id="removeOwnPhoto">Remove my photo</button>` : ''}
+    </div>
+
+    <div class="field">
+      <label>Ingredients (one per line)</label>
+      <textarea id="ingInput" placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs">${esc((f.ingredients||[]).join('\n'))}</textarea>
+    </div>
+
+    <div class="field">
+      <label>Instructions (one step per line)</label>
+      <textarea id="stepInput" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;…">${esc((f.instructions||[]).join('\n'))}</textarea>
+    </div>
+
+    <div class="actionrow">
+      <button class="btn primary" id="saveBtn" ${s.saving?'disabled':''}>${s.saving ? 'Saving…' : (s.editingId ? 'Save changes' : 'Add to the box')}</button>
+    </div>
+  </div>`;
+}
+
+function meView(s){
+  const mine = s.recipes.filter(r => r.addedBy === s.profile.name).length;
+  const shareUrl = window.location.href.split('?')[0];
+  return `
+  <div class="topbar"><div class="brand"><h1>Me</h1></div></div>
+  <div class="mecard">
+    <div class="name">${esc(s.profile.name)}</div>
+    <div class="role">${mine} recipe${mine===1?'':'s'} added</div>
+    <button class="toplink" id="changeNameBtn" style="margin-top:12px;">Change name</button>
+  </div>
+  <div class="infoblock">
+    <b>Sharing with family &amp; friends</b><br>
+    Everyone who opens this same web address shares one recipe box — whatever you add, they see, and whatever they add, you see. Send them this link:<br>
+    <span style="word-break:break-all;color:var(--ink);">${esc(shareUrl)}</span>
+    <div style="margin-top:10px;"><button class="toplink" id="copyLinkBtn">Copy this link</button></div>
+  </div>
+  <div class="infoblock">
+    <b>Sending a single recipe</b><br>
+    Open any recipe and tap the share icon to copy a clean, text-only version of it (ingredients, steps, and the original link) to send by text or email — even to people who don't have this site open.
+  </div>`;
+}
+
+function shareModal(s){
+  return `<div class="modalbg" id="modalBg">
+    <div class="modal">
+      <h3>${esc(s.shareModal.title)}</h3>
+      <textarea id="shareText" readonly>${esc(s.shareModal.text)}</textarea>
+      <div class="actionrow">
+        <button class="btn primary" id="copyShareBtn">Copy text</button>
+        <button class="btn" id="closeShareBtn">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- Actions ---------------- */
+function newForm(){
+  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[] };
+}
+
+function openDetail(id){
+  const rec = state.recipes.find(r => r.id === id);
+  state.view = 'detail'; state.detail = rec || null; render();
+}
+function goList(){ state.view='list'; state.detail=null; state.editingId=null; state.form=null; state.extractStatus=null; render(); }
+
+async function handlePasteExtract(){
+  const text = document.getElementById('pasteInput').value.trim();
+  if (!text) return;
+  state.extractStatus = {type:'loading', msg:'Reading the recipe from that text…'};
+  render();
+  try{
+    const data = await extractFromText(text);
+    state.form.title = data.title || state.form.title;
+    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
+    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.extractStatus = {type:'ok', msg:'Recipe pulled from the text — review and edit anything below, and add a photo if you like.'};
+  }catch(e){
+    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that text. Try again or add it by hand.'};
+  }
+  render();
+}
+
+async function handleExtract(){
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  state.extractStatus = {type:'loading', msg:'Reading the page and pulling out the recipe…'};
+  render();
+  try{
+    const data = await extractFromUrl(url);
+    state.form.title = data.title || state.form.title;
+    state.form.sourceUrl = url;
+    state.form.sourceImageUrl = data.imageUrl || null;
+    state.form.chosenPhoto = data.imageUrl ? 'source' : (state.form.ownPhotoDataUrl ? 'own' : 'source');
+    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
+    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.extractStatus = {type:'ok', msg:'Recipe pulled in — review and edit anything below.'};
+  }catch(e){
+    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that page. Try again or add it by hand.'};
+  }
+  render();
+}
+
+async function extractFromText(text){
+  const res = await fetch(WORKER_URL + '/extract-text', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ text })
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Could not read that text.');
+  return data;
+}
+
+async function handleScan(file){
+  state.extractStatus = {type:'loading', msg:'Reading the recipe card…'};
+  render();
+  try{
+    const photoDataUrl = await resizeImageFile(file, 1400, 0.85);
+    const data = await extractFromImage(photoDataUrl);
+    state.form.title = data.title || state.form.title;
+    state.form.sourceUrl = null;
+    state.form.sourceImageUrl = null;
+    state.form.ownPhotoDataUrl = photoDataUrl;
+    state.form.chosenPhoto = 'own';
+    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
+    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.extractStatus = {type:'ok', msg:'Recipe read from the photo — review and edit anything below.'};
+  }catch(e){
+    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that photo. Try again or add it by hand.'};
+  }
+  render();
+}
+
+async function handleSave(){
+  const title = document.getElementById('titleInput').value.trim();
+  if (!title){ alert('Give the recipe a title first.'); return; }
+  const ingredients = document.getElementById('ingInput').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const instructions = document.getElementById('stepInput').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  state.saving = true; render();
+
+  const id = state.editingId || uid();
+  const existing = state.recipes.find(r => r.id === id);
+  const createdAt = existing ? existing.createdAt : Date.now();
+
+  try{
+    let ownPhotoUrl = existing ? existing.ownPhotoUrl || null : null;
+    if (state.form.ownPhotoDataUrl && state.form.ownPhotoDataUrl.startsWith('data:')){
+      ownPhotoUrl = await uploadOwnPhoto(id, state.form.ownPhotoDataUrl);
+    } else if (!state.form.ownPhotoDataUrl){
+      if (existing && existing.ownPhotoUrl) await deleteOwnPhoto(id);
+      ownPhotoUrl = null;
+    }
+
+    const rec = {
+      title,
+      sourceUrl: state.form.sourceUrl || null,
+      sourceImageUrl: state.form.sourceImageUrl || null,
+      ownPhotoUrl: ownPhotoUrl || null,
+      chosenPhoto: state.form.chosenPhoto || 'source',
+      ingredients, instructions,
+      addedBy: state.profile.name,
+      createdAt
+    };
+    await setDoc(doc(db, 'recipes', id), rec);
+    state.saving = false;
+    state.view = 'list'; state.form = null; state.editingId = null; state.extractStatus = null;
+  }catch(e){
+    console.error(e);
+    state.saving = false;
+    alert('Could not save — check your connection and Firebase setup, then try again.');
+  }
+  render();
+}
+
+async function handleDelete(){
+  if (!confirm('Remove this recipe from the family box for everyone?')) return;
+  const id = state.detail.id;
+  try{
+    await deleteDoc(doc(db, 'recipes', id));
+    await deleteOwnPhoto(id);
+  }catch(e){ console.error(e); }
+  goList();
+}
+
+function openShareForDetail(){
+  const r = state.detail;
+  const lines = [
+    r.title, '',
+    'INGREDIENTS',
+    ...(r.ingredients||[]).map(i=>'• '+i), '',
+    'INSTRUCTIONS',
+    ...(r.instructions||[]).map((i,idx)=>(idx+1)+'. '+i),
+  ];
+  if (r.sourceUrl){ lines.push(''); lines.push('Original recipe: ' + r.sourceUrl); }
+  const text = lines.join('\n');
+  if (navigator.share){
+    navigator.share({title: r.title, text}).catch(()=>{ state.shareModal = {title: r.title, text}; render(); });
+  } else {
+    state.shareModal = {title: r.title, text};
+    render();
+  }
+}
+
+/* ---------------- Event delegation ---------------- */
+document.addEventListener('click', async (e) => {
+  const t = e.target;
+
+  if (t.id === 'startBtn' || t.closest('#startBtn')){
+    const val = document.getElementById('nameInput').value.trim();
+    if (!val) return;
+    state.profile = { name: val };
+    saveProfile(state.profile);
+    render(); return;
+  }
+
+  const tab = t.closest('[data-tab]');
+  if (tab){
+    const key = tab.dataset.tab;
+    if (key === 'add' && state.view !== 'add'){ state.form = newForm(); state.editingId = null; state.extractStatus = null; }
+    state.view = key; render(); return;
+  }
+
+  const filterBtn = t.closest('[data-filter]');
+  if (filterBtn){ state.filter = filterBtn.dataset.filter; render(); return; }
+
+  const openBtn = t.closest('[data-open]');
+  if (openBtn){ openDetail(openBtn.dataset.open); return; }
+
+  const backBtn = t.closest('[data-back]');
+  if (backBtn){ goList(); return; }
+
+  if (t.id === 'extractBtn' || t.closest('#extractBtn')){ handleExtract(); return; }
+  if (t.id === 'pasteExtractBtn' || t.closest('#pasteExtractBtn')){ handlePasteExtract(); return; }
+  if (t.id === 'saveBtn'){ handleSave(); return; }
+
+  const choosePhoto = t.closest('[data-choosephoto]');
+  if (choosePhoto){ state.form.chosenPhoto = choosePhoto.dataset.choosephoto; render(); return; }
+
+  const switchPhoto = t.closest('[data-switchphoto]');
+  if (switchPhoto){
+    const choice = switchPhoto.dataset.switchphoto;
+    state.detail.chosenPhoto = choice;
+    try{ await setDoc(doc(db, 'recipes', state.detail.id), { chosenPhoto: choice }, { merge: true }); }
+    catch(e){ console.error(e); }
+    render(); return;
+  }
+
+  if (t.id === 'removeOwnPhoto'){
+    state.form.ownPhotoDataUrl = null;
+    if (state.form.chosenPhoto === 'own') state.form.chosenPhoto = 'source';
+    render(); return;
+  }
+
+  if (t.closest('[data-action="edit"]')){
+    const r = state.detail;
+    state.form = { title:r.title, sourceUrl:r.sourceUrl, sourceImageUrl:r.sourceImageUrl, ownPhotoDataUrl:r.ownPhotoUrl, chosenPhoto:r.chosenPhoto, ingredients:r.ingredients, instructions:r.instructions };
+    state.editingId = r.id; state.extractStatus = null; state.view = 'add'; render(); return;
+  }
+  if (t.closest('[data-action="delete"]')){ handleDelete(); return; }
+  if (t.closest('[data-action="share"]')){ openShareForDetail(); return; }
+
+  if (t.id === 'changeNameBtn'){
+    const val = prompt('Your first name', state.profile.name);
+    if (val && val.trim()){ state.profile.name = val.trim(); saveProfile(state.profile); render(); }
+    return;
+  }
+
+  if (t.id === 'copyLinkBtn'){
+    const url = window.location.href.split('?')[0];
+    try{ await navigator.clipboard.writeText(url); t.textContent='Copied ✓'; setTimeout(()=>{t.textContent='Copy this link';},1500); }
+    catch(e){ prompt('Copy this link:', url); }
+    return;
+  }
+
+  if (t.id === 'copyShareBtn'){
+    const ta = document.getElementById('shareText');
+    ta.select(); ta.setSelectionRange(0, 999999);
+    try{ await navigator.clipboard.writeText(ta.value); }catch(err){ try{ document.execCommand('copy'); }catch(e2){} }
+    t.textContent = 'Copied ✓';
+    setTimeout(()=>{ t.textContent='Copy text'; }, 1500);
+    return;
+  }
+  if (t.id === 'closeShareBtn' || t.id === 'modalBg'){
+    if (t.id === 'modalBg' && e.target !== t) return;
+    state.shareModal = null; render(); return;
+  }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'nameInput'){
+    document.getElementById('startBtn').disabled = !e.target.value.trim();
+  }
+  if (e.target.id === 'searchInput'){
+    state.query = e.target.value;
+    render();
+    setTimeout(()=>{ const el=document.getElementById('searchInput'); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } },0);
+  }
+});
+
+document.addEventListener('change', async (e) => {
+  if (e.target.id === 'photoInput' && e.target.files[0]){
+    try{
+      const b64 = await resizeImageFile(e.target.files[0]);
+      state.form.ownPhotoDataUrl = b64;
+      state.form.chosenPhoto = 'own';
+      render();
+    }catch(err){ alert('Could not read that photo — try another.'); }
+  }
+  if (e.target.id === 'scanInput' && e.target.files[0]){
+    handleScan(e.target.files[0]);
+    e.target.value = '';
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'nameInput'){
+    document.getElementById('startBtn').click();
+  }
+});
+</script>
+</body>
+</html>
