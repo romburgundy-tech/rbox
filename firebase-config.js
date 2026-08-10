@@ -1,7 +1,7 @@
 // Fill these in with your own Firebase project's values.
 // Firebase console → Project settings → General → "Your apps" → SDK setup and configuration.
 export const firebaseConfig = {
-  apiKey: "AIzaSyB2_qmW29Wf9wQuMb72NvZqOy74QJ_QCOQ",
+  apiKey: "AIzaSyAwns0bSRkGyGu6T8DezFSmrIGVA1Dq2mE",
   authDomain: "family-recipe-box-24eaa.firebaseapp.com",
   projectId: "family-recipe-box-24eaa",
   storageBucket: "family-recipe-box-24eaa.firebasestorage.app",
