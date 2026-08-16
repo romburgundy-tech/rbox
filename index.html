@@ -90,6 +90,21 @@
     border:1px solid var(--line);
   }
   .rthumb.placeholder{display:flex;align-items:center;justify-content:center;color:var(--line-strong);}
+  .rthumb-wrap{display:contents;}
+  .photohero-wrap{display:contents;}
+
+  /* ---- Recipe grid tiles ---- */
+  .tilegrid{padding:4px 20px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .tile:active{background:#FBF6EC;}
+  .tilephoto-wrap{display:contents;}
+  .tilephoto{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#EFE7D4;}
+  .tilephoto.placeholder{display:flex;align-items:center;justify-content:center;color:var(--line-strong);}
+  .tilebody{padding:10px 11px 11px;}
+  .tiletitle{font-family:'Fraunces',serif;font-size:15px;font-weight:600;line-height:1.22;color:var(--ink);margin-bottom:6px;
+    overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;margin-bottom:5px;}
+  .tilebody .rmeta{margin-top:4px;}
   .rinfo{min-width:0;flex:1;}
   .rinfo h3{font-size:17.5px;font-weight:600;line-height:1.22;color:var(--ink);
     overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
@@ -303,6 +318,41 @@ render();
 
 /* ---------------- Utilities ---------------- */
 function uid(){ return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+
+/* ---------------- Categories ---------------- */
+const CATEGORIES = ["Breakfast","Main Dish","Side Dish","Soup","Salad","Sauce","Dessert","Baking & Bread","Drinks","Appetizer & Snack","Other"];
+const CATEGORY_STYLE = {
+  "Breakfast": {bg:"#FDF0D5", fg:"#7A4B06"},
+  "Main Dish": {bg:"#FAEEDA", fg:"#633806"},
+  "Side Dish": {bg:"#F1EAD9", fg:"#5C4A2E"},
+  "Soup": {bg:"#E5EEF7", fg:"#1F4E79"},
+  "Salad": {bg:"#EAF3DE", fg:"#27500A"},
+  "Sauce": {bg:"#E7F0E3", fg:"#33502A"},
+  "Dessert": {bg:"#FBEAF0", fg:"#72243E"},
+  "Baking & Bread": {bg:"#F3E8DA", fg:"#6B4423"},
+  "Drinks": {bg:"#E8F0F5", fg:"#2B5C6B"},
+  "Appetizer & Snack": {bg:"#F5E9F5", fg:"#5A2D5A"},
+  "Other": {bg:"#EFEAE0", fg:"#6B6152"},
+};
+const CATEGORY_KEYWORDS = [
+  ["Dessert", ["cake","cookie","brownie","pie","pudding","ice cream","cheesecake","dessert","chocolate","tart","custard","mousse","banana bread","cupcake"]],
+  ["Baking & Bread", ["bread","loaf","dough","baguette","focaccia","biscuit","roll","sourdough","flatbread","naan","pretzel","scone","muffin"]],
+  ["Breakfast", ["pancake","waffle","omelet","omelette","breakfast","granola","oatmeal","french toast","hash brown","frittata"]],
+  ["Drinks", ["smoothie","cocktail","mocktail","juice","lemonade","milkshake","punch","sangria","iced tea"]],
+  ["Sauce", ["sauce","dressing","marinade","salsa","hummus","dip","chutney","gravy","glaze"]],
+  ["Soup", ["soup","stew","chowder","bisque","broth","chili"]],
+  ["Salad", ["salad","slaw"]],
+  ["Appetizer & Snack", ["appetizer","snack","finger food","bites","skewers"]],
+  ["Side Dish", ["side dish","mashed potatoes","roasted vegetables","rice pilaf"]],
+  ["Main Dish", ["chicken","beef","pork","lamb","fish","salmon","shrimp","pasta","pizza","curry","stir fry","casserole","dinner","roast","taco","burger","meatball","bean","lentil","tofu","steak","meatloaf"]],
+];
+function guessCategory(title, extraText){
+  const hay = ((title||'') + ' ' + (extraText||'')).toLowerCase();
+  for (const [cat, words] of CATEGORY_KEYWORDS){
+    if (words.some(w => hay.includes(w))) return cat;
+  }
+  return "Other";
+}
 function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return ''; } }
 
@@ -421,16 +471,17 @@ function listView(s){
 
   const list = items.length ? items.map(r => {
     const thumb = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
+    const cat = r.category && CATEGORY_STYLE[r.category] ? r.category : null;
+    const catStyle = cat ? CATEGORY_STYLE[cat] : null;
     return `
-    <div class="rcard" data-open="${r.id}">
-      <div class="punch"></div>
-      ${thumb ? `<img class="rthumb" src="${esc(thumb)}" onerror="this.outerHTML='<div class=&quot;rthumb placeholder&quot;>${ICON.pot}</div>'">`
-                    : `<div class="rthumb placeholder">${ICON.pot}</div>`}
-      <div class="rinfo">
-        <h3>${esc(r.title)}</h3>
+    <div class="tile" data-open="${r.id}">
+      ${thumb ? `<div class="tilephoto-wrap"><img class="tilephoto" src="${esc(thumb)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="tilephoto placeholder" style="display:none;">${ICON.pot}</div></div>`
+                    : `<div class="tilephoto placeholder">${ICON.pot}</div>`}
+      <div class="tilebody">
+        <div class="tiletitle">${esc(r.title)}</div>
+        ${cat ? `<span class="badge" style="background:${catStyle.bg};color:${catStyle.fg};">${esc(cat)}</span>` : ''}
         <div class="rmeta">${esc(r.addedBy)} · ${fmtDate(r.createdAt)}</div>
       </div>
-      <div class="chev">${ICON.chevron}</div>
     </div>`;
   }).join('') : `<div class="empty"><h3>Nothing here yet</h3><p>${q ? 'No recipes match your search.' : 'Recipes added here will show up for the whole family.'}</p></div>`;
 
@@ -440,7 +491,7 @@ function listView(s){
   </div>
   <div class="searchwrap"><div class="search">${ICON.search}<input id="searchInput" type="text" placeholder="Search recipes by title…" value="${esc(s.query)}"></div></div>
   <div class="chiprow">${chips}</div>
-  <div class="list">${list}</div>`;
+  <div class="tilegrid">${list}</div>`;
 }
 
 function detailView(s){
@@ -449,6 +500,8 @@ function detailView(s){
   const photo = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
   const isMine = r.addedBy === s.profile.name;
   const canSwitch = r.sourceImageUrl && r.ownPhotoUrl;
+  const cat = r.category && CATEGORY_STYLE[r.category] ? r.category : null;
+  const catStyle = cat ? CATEGORY_STYLE[cat] : null;
 
   return `
   <div class="screenhead" style="position:absolute;top:0;left:0;right:0;z-index:5;">
@@ -456,10 +509,11 @@ function detailView(s){
     <div style="flex:1;"></div>
     <button class="iconbtn" data-action="share" style="background:rgba(255,255,255,0.9);">${ICON.share}</button>
   </div>
-  ${photo ? `<img class="photohero" src="${esc(photo)}" onerror="this.outerHTML='<div class=&quot;photohero placeholder&quot;>${ICON.pot}</div>'">`
+  ${photo ? `<div class="photohero-wrap"><img class="photohero" src="${esc(photo)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="photohero placeholder" style="display:none;">${ICON.pot}</div></div>`
           : `<div class="photohero placeholder">${ICON.pot}</div>`}
   <div class="detailbody">
     <h1>${esc(r.title)}</h1>
+    ${cat ? `<span class="badge" style="background:${catStyle.bg};color:${catStyle.fg};margin-bottom:10px;display:inline-block;">${esc(cat)}</span>` : ''}
     <div class="metaline">
       <span>Added by ${esc(r.addedBy)} · ${fmtDate(r.createdAt)}</span>
       ${r.sourceUrl ? `<a href="${esc(r.sourceUrl)}" target="_blank" rel="noopener">Original recipe ↗</a>` : ''}
@@ -592,7 +646,7 @@ function shareModal(s){
 
 /* ---------------- Actions ---------------- */
 function newForm(){
-  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[] };
+  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[], category:null };
 }
 
 function openDetail(id){
@@ -611,6 +665,7 @@ async function handlePasteExtract(){
     state.form.title = data.title || state.form.title;
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    if (data.category && CATEGORIES.includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe pulled from the text — review and edit anything below, and add a photo if you like.'};
   }catch(e){
     state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that text. Try again or add it by hand.'};
@@ -631,6 +686,7 @@ async function handleExtract(){
     state.form.chosenPhoto = data.imageUrl ? 'source' : (state.form.ownPhotoDataUrl ? 'own' : 'source');
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    if (data.category && CATEGORIES.includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe pulled in — review and edit anything below.'};
   }catch(e){
     state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that page. Try again or add it by hand.'};
@@ -663,6 +719,7 @@ async function handleScan(file){
     state.form.chosenPhoto = 'own';
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    if (data.category && CATEGORIES.includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe read from the photo — review and edit anything below.'};
   }catch(e){
     state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that photo. Try again or add it by hand.'};
@@ -680,6 +737,9 @@ async function handleSave(){
   const id = state.editingId || uid();
   const existing = state.recipes.find(r => r.id === id);
   const createdAt = existing ? existing.createdAt : Date.now();
+  const category = (state.form.category && CATEGORIES.includes(state.form.category))
+    ? state.form.category
+    : guessCategory(title, ingredients.join(' ') + ' ' + instructions.join(' '));
 
   try{
     let ownPhotoUrl = existing ? existing.ownPhotoUrl || null : null;
@@ -697,6 +757,7 @@ async function handleSave(){
       ownPhotoUrl: ownPhotoUrl || null,
       chosenPhoto: state.form.chosenPhoto || 'source',
       ingredients, instructions,
+      category,
       addedBy: state.profile.name,
       createdAt
     };
