@@ -312,6 +312,9 @@ let state = {
   roster: [],
   customCategories: {},
   mealPlanIds: [],
+  groceryItems: null,
+  groceryLoading: false,
+  groceryError: null,
   detail: null,
   editingId: null,
   form: null,
@@ -321,7 +324,24 @@ let state = {
   textSize: loadTextSize(),
 };
 
-function render(){ document.getElementById('app').innerHTML = viewFor(state); }
+function render(){
+  const active = document.activeElement;
+  const appEl = document.getElementById('app');
+  let focusInfo = null;
+  if (active && active.id && appEl.contains(active)){
+    focusInfo = { id: active.id, start: active.selectionStart, end: active.selectionEnd };
+  }
+  appEl.innerHTML = viewFor(state);
+  if (focusInfo){
+    const el = document.getElementById(focusInfo.id);
+    if (el){
+      el.focus();
+      if (typeof el.setSelectionRange === 'function' && focusInfo.start != null){
+        try{ el.setSelectionRange(focusInfo.start, focusInfo.end); }catch(e){}
+      }
+    }
+  }
+}
 
 /* ---------------- Profile (local to this device) ---------------- */
 function loadProfile(){
@@ -517,6 +537,18 @@ async function extractFromText(text){
   return data;
 }
 
+async function aggregateGroceryItems(items){
+  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
+  const res = await fetch(WORKER_URL + '/aggregate-grocery', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ items })
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Could not combine the list.');
+  return data.items || [];
+}
+
 /* ---------------- Photo storage (Firebase Storage) ---------------- */
 async function uploadOwnPhoto(id, dataUrl){
   const r = ref(storage, `recipes/${id}/own.jpg`);
@@ -664,21 +696,20 @@ function mealPlanView(s){
 }
 
 function groceryView(s){
-  const items = s.recipes.filter(r => s.mealPlanIds.includes(r.id));
-  const lines = [];
-  items.forEach(r => (r.ingredients||[]).forEach(i => lines.push({ text: i, from: r.title })));
-  const grouped = {};
-  lines.forEach(l => {
-    const key = l.text.trim().toLowerCase();
-    if (!grouped[key]) grouped[key] = { text: l.text, sources: [] };
-    if (!grouped[key].sources.includes(l.from)) grouped[key].sources.push(l.from);
-  });
-  const sorted = Object.values(grouped).sort((a,b) => a.text.localeCompare(b.text));
+  if (s.groceryLoading){
+    return `
+    <div class="screenhead">
+      <button class="iconbtn" data-back="mealplan">${ICON.back}</button>
+      <h2>Grocery list</h2>
+    </div>
+    <div class="status" style="margin:0 20px;"><div class="spinner"></div> Combining matching ingredients…</div>`;
+  }
 
+  const sorted = s.groceryItems || [];
   const rows = sorted.length ? sorted.map((it, idx) => `
     <div class="groceryitem ${window.__groceryChecked && window.__groceryChecked.has(idx) ? 'checked' : ''}" data-grocery-toggle="${idx}">
       <div class="gcheck">${window.__groceryChecked && window.__groceryChecked.has(idx) ? ICON.check : ''}</div>
-      <div>${esc(it.text)}<span class="grocerysrc">${esc(it.sources.join(', '))}</span></div>
+      <div>${esc(it.text)}<span class="grocerysrc">${esc((it.sources||[]).join(', '))}</span></div>
     </div>`).join('') : `<div class="empty"><h3>Nothing to list</h3><p>Add recipes to your meal plan first.</p></div>`;
 
   return `
@@ -686,6 +717,7 @@ function groceryView(s){
     <button class="iconbtn" data-back="mealplan">${ICON.back}</button>
     <h2>Grocery list</h2>
   </div>
+  ${s.groceryError ? `<div class="status error" style="margin:0 20px 12px;">${esc(s.groceryError)}</div>` : ''}
   <div class="grocerylist">${rows}</div>`;
 }
 
@@ -693,7 +725,7 @@ function detailView(s){
   const r = s.detail;
   if (!r) return `<div class="screenhead"><button class="iconbtn" data-back="list">${ICON.back}</button><h2>Loading…</h2></div>`;
   const photo = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
-  const isMine = r.addedBy === s.profile.name;
+  const isMine = (r.addedBy||'').trim() === (s.profile.name||'').trim();
   const canEdit = isMine || isAdmin(s);
   const canSwitch = r.sourceImageUrl && r.ownPhotoUrl;
   const styles = allCategoryStyles(s);
@@ -812,12 +844,12 @@ function addView(s){
 
     <div class="field">
       <label>Ingredients (one per line)</label>
-      <textarea id="ingInput" placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs">${esc((f.ingredients||[]).join('\n'))}</textarea>
+      <textarea id="ingInput" placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs">${esc(f.ingredientsText != null ? f.ingredientsText : (f.ingredients||[]).join('\n'))}</textarea>
     </div>
 
     <div class="field">
       <label>Instructions (one step per line)</label>
-      <textarea id="stepInput" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;…">${esc((f.instructions||[]).join('\n'))}</textarea>
+      <textarea id="stepInput" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;…">${esc(f.instructionsText != null ? f.instructionsText : (f.instructions||[]).join('\n'))}</textarea>
     </div>
 
     <div class="actionrow">
@@ -903,7 +935,7 @@ function shareModal(s){
 
 /* ---------------- Actions ---------------- */
 function newForm(){
-  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[], category:null, addedBy:null };
+  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[], ingredientsText:'', instructionsText:'', category:null, addedBy:null };
 }
 
 function openDetail(id){
@@ -923,6 +955,40 @@ async function toggleMealPlan(recipeId){
   }catch(e){ console.error(e); }
 }
 
+async function handleGenerateGrocery(){
+  const items = state.recipes.filter(r => state.mealPlanIds.includes(r.id));
+  const lines = [];
+  items.forEach(r => (r.ingredients||[]).forEach(i => lines.push({ text: i, from: r.title })));
+  window.__groceryChecked = new Set();
+  if (!lines.length){
+    state.groceryItems = [];
+    state.groceryError = null;
+    state.view = 'grocery';
+    render();
+    return;
+  }
+  state.view = 'grocery';
+  state.groceryLoading = true;
+  state.groceryError = null;
+  render();
+  try{
+    state.groceryItems = await aggregateGroceryItems(lines);
+  }catch(e){
+    console.error(e);
+    // Fall back to a plain grouped (non-aggregated) list so the feature still works.
+    const grouped = {};
+    lines.forEach(l => {
+      const key = l.text.trim().toLowerCase();
+      if (!grouped[key]) grouped[key] = { text: l.text, sources: [] };
+      if (!grouped[key].sources.includes(l.from)) grouped[key].sources.push(l.from);
+    });
+    state.groceryItems = Object.values(grouped).sort((a,b) => a.text.localeCompare(b.text));
+    state.groceryError = "Couldn't combine quantities automatically this time — showing items separately instead.";
+  }
+  state.groceryLoading = false;
+  render();
+}
+
 async function handlePasteExtract(){
   const text = document.getElementById('pasteInput').value.trim();
   if (!text) return;
@@ -933,6 +999,8 @@ async function handlePasteExtract(){
     state.form.title = data.title || state.form.title;
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.form.ingredientsText = state.form.ingredients.join('\n');
+    state.form.instructionsText = state.form.instructions.join('\n');
     if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe pulled from the text — review and edit anything below, and add a photo if you like.'};
   }catch(e){
@@ -954,6 +1022,8 @@ async function handleExtract(){
     state.form.chosenPhoto = data.imageUrl ? 'source' : (state.form.ownPhotoDataUrl ? 'own' : 'source');
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.form.ingredientsText = state.form.ingredients.join('\n');
+    state.form.instructionsText = state.form.instructions.join('\n');
     if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe pulled in — review and edit anything below.'};
   }catch(e){
@@ -975,6 +1045,8 @@ async function handleScan(file){
     state.form.chosenPhoto = 'own';
     state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
     state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
+    state.form.ingredientsText = state.form.ingredients.join('\n');
+    state.form.instructionsText = state.form.instructions.join('\n');
     if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
     state.extractStatus = {type:'ok', msg:'Recipe read from the photo — review and edit anything below.'};
   }catch(e){
@@ -1119,6 +1191,9 @@ document.addEventListener('click', async (e) => {
   const filterBtn = t.closest('[data-filter]');
   if (filterBtn){ state.filter = filterBtn.dataset.filter; render(); return; }
 
+  const togglePlan = t.closest('[data-toggleplan]');
+  if (togglePlan){ toggleMealPlan(togglePlan.dataset.toggleplan); return; }
+
   const openBtn = t.closest('[data-open]');
   if (openBtn){ openDetail(openBtn.dataset.open); return; }
 
@@ -1127,10 +1202,7 @@ document.addEventListener('click', async (e) => {
 
   if (t.closest('[data-clear-category]')){ state.categoryFilter = null; render(); return; }
 
-  const togglePlan = t.closest('[data-toggleplan]');
-  if (togglePlan){ toggleMealPlan(togglePlan.dataset.toggleplan); return; }
-
-  if (t.id === 'groceryBtn'){ state.view = 'grocery'; render(); return; }
+  if (t.id === 'groceryBtn'){ handleGenerateGrocery(); return; }
 
   const groceryToggle = t.closest('[data-grocery-toggle]');
   if (groceryToggle){
@@ -1190,7 +1262,7 @@ document.addEventListener('click', async (e) => {
 
   if (t.closest('[data-action="edit"]')){
     const r = state.detail;
-    state.form = { title:r.title, sourceUrl:r.sourceUrl, sourceImageUrl:r.sourceImageUrl, ownPhotoDataUrl:r.ownPhotoUrl, chosenPhoto:r.chosenPhoto, ingredients:r.ingredients, instructions:r.instructions, category:r.category||null, addedBy:r.addedBy };
+    state.form = { title:r.title, sourceUrl:r.sourceUrl, sourceImageUrl:r.sourceImageUrl, ownPhotoDataUrl:r.ownPhotoUrl, chosenPhoto:r.chosenPhoto, ingredients:r.ingredients, instructions:r.instructions, ingredientsText:(r.ingredients||[]).join('\n'), instructionsText:(r.instructions||[]).join('\n'), category:r.category||null, addedBy:r.addedBy };
     state.editingId = r.id; state.extractStatus = null; state.view = 'add'; render(); return;
   }
   if (t.closest('[data-action="delete"]')){ handleDelete(); return; }
@@ -1236,6 +1308,8 @@ document.addEventListener('change', async (e) => {
     handleScan(e.target.files[0]);
     e.target.value = '';
   }
+  if (e.target.id === 'categorySelect'){ state.form.category = e.target.value || null; }
+  if (e.target.id === 'ownerSelect'){ state.form.addedBy = e.target.value; }
   const reassignSel = e.target.closest('[data-reassign-from]');
   if (reassignSel){
     const from = reassignSel.dataset.reassignFrom;
@@ -1252,8 +1326,10 @@ document.addEventListener('input', (e) => {
   if (e.target.id === 'searchInput'){
     state.query = e.target.value;
     render();
-    setTimeout(()=>{ const el=document.getElementById('searchInput'); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } },0);
   }
+  if (e.target.id === 'titleInput'){ state.form.title = e.target.value; }
+  if (e.target.id === 'ingInput'){ state.form.ingredientsText = e.target.value; }
+  if (e.target.id === 'stepInput'){ state.form.instructionsText = e.target.value; }
 });
 
 document.addEventListener('keydown', (e) => {
