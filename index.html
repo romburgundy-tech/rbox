@@ -279,7 +279,7 @@ import {
 import { 
   getStorage, ref, uploadString, getDownloadURL, deleteObject, connectStorageEmulator
 } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js';
-import firebaseConfig from './firebase-config.js';
+import { firebaseConfig, WORKER_URL } from './firebase-config.js';
 
 window.CATEGORY_STYLE = {
   "Breakfast": {bg:"#D4EBD9",fg:"#1B4D1B"},
@@ -300,7 +300,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const ADMIN_NAMES = ['ramy', 'jennifer'];
-const WORKER_URL = 'https://recipe-box-worker.romburgundy.workers.dev';
 let recipes = [];
 
 if (location.hostname === 'localhost'){
