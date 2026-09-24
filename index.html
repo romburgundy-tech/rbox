@@ -267,14 +267,18 @@
 
 <script type="module">
 import {
-  initializeApp, getAuth, signInAnonymously, onAuthStateChanged,
-  getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy,
-  getStorage, ref, uploadString, getDownloadURL, deleteObject,
-  arrayUnion, arrayRemove
+  initializeApp
 } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
-import { connectAuthEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
-import { connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js';
-import { connectStorageEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js';
+import { 
+  getAuth, signInAnonymously, onAuthStateChanged, connectAuthEmulator
+} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+import { 
+  getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy,
+  arrayUnion, arrayRemove, connectFirestoreEmulator
+} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js';
+import { 
+  getStorage, ref, uploadString, getDownloadURL, deleteObject, connectStorageEmulator
+} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js';
 import firebaseConfig from './firebase-config.js';
 
 window.CATEGORY_STYLE = {
