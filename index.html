@@ -248,15 +248,22 @@
 
   /* ---- Tab bar ---- */
   .tabbar{
-    position:fixed;bottom:0;left:0;right:0;display:flex;border-top:1px solid var(--line);
+    position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;border-top:1px solid var(--line);
     background:var(--parchment);z-index:10;padding-bottom:var(--safe-b);
   }
   .tab{
-    flex:1;padding:10px;text-align:center;border:none;background:none;cursor:pointer;
-    font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;
+    flex:1;padding:8px 4px;text-align:center;border:none;background:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;
     color:var(--ink-soft);
   }
+  .tab .tabicon{font-size:19px;line-height:1;}
   .tab.active{color:var(--sage);}
+  .tab.addtab .tabicon{
+    width:40px;height:40px;border-radius:50%;background:var(--sage);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:1px;
+  }
+  .tab.addtab:active .tabicon{transform:scale(0.94);}
 </style>
 </head>
 <body>
@@ -475,7 +482,7 @@ async function deleteOwnPhoto(id){
 
 /* ---- View renderers ---- */
 const ICON = {
-  back:'←',list:'📋',mealplan:'🍽️',me:'👤',add:'➕',
+  back:'←',list:'📋',mealplan:'🍽️',me:'👤',add:'➕',plus:'+',
   search:'🔍',filter:'🎯',categories:'📂',trash:'🗑️',
   pencil:'✏️',check:'✔',cart:'🛒',share:'↗️',camera:'📷',
   pot:'🍲',wand:'✨',close:'✕',
@@ -515,12 +522,13 @@ function tabBar(s){
   const tabs = [
     {id:'list', label:'Recipes', icon:ICON.list},
     {id:'categories', label:'Categories', icon:ICON.categories},
+    {id:'add', label:'Add', icon:ICON.add, isAdd:true},
     {id:'mealplan', label:'Meal Plan', icon:ICON.mealplan},
     {id:'me', label:'Me', icon:ICON.me},
   ];
   return `
   <div class="tabbar">
-    ${tabs.map(t => `<button class="tab ${s.view===t.id?'active':''}" data-tab="${t.id}">${t.icon}</button>`).join('')}
+    ${tabs.map(t => `<button class="tab ${s.view===t.id?'active':''} ${t.isAdd?'addtab':''}" data-tab="${t.id}"><span class="tabicon">${t.icon}</span>${t.label}</button>`).join('')}
   </div>`;
 }
 
@@ -880,6 +888,25 @@ function startMealPlanSync(uid){
   }, err => console.error(err));
 }
 
+// BUG FIX #6: onAuthStateChanged can legitimately fire more than once for the
+// same signed-in user (token refresh, tab regaining focus, reconnect after a
+// network blip, etc). Previously every fire re-ran startRecipeSync/startRosterSync/
+// startCategoriesSync/startMealPlanSync, which each register a NEW onSnapshot
+// listener on top of the old one (old ones were never removed). Every recipe
+// edit would then trigger an ever-growing pile of duplicate listener callbacks
+// and full re-renders, which is exactly what made the app get slower and
+// eventually unresponsive the longer you used it. This guard makes sure the
+// sync listeners are registered exactly once per page load.
+let syncListenersStarted = false;
+function startAllSync(uid){
+  if (syncListenersStarted) return;
+  syncListenersStarted = true;
+  startRecipeSync();
+  startRosterSync();
+  startCategoriesSync();
+  startMealPlanSync(uid);
+}
+
 /* ---- Boot ---- */
 onAuthStateChanged(auth, user => {
   if (!user){
@@ -899,10 +926,7 @@ onAuthStateChanged(auth, user => {
   }
   state.profile = p;
   state.recipes = [];
-  startRecipeSync();
-  startRosterSync();
-  startCategoriesSync();
-  startMealPlanSync(user.uid);
+  startAllSync(user.uid);
   registerInRoster(p.name);
   render();
 });
@@ -1186,10 +1210,7 @@ document.addEventListener('click', async (e) => {
     state.profile = { name: name.trim() };
     saveProfile(state.profile);
     state.recipes = [];
-    startRecipeSync();
-    startRosterSync();
-    startCategoriesSync();
-    startMealPlanSync(auth.currentUser.uid);
+    startAllSync(auth.currentUser.uid);
     registerInRoster(state.profile.name);
     render();
     return;
@@ -1210,13 +1231,25 @@ document.addEventListener('click', async (e) => {
   }
 
   const tab = t.closest('[data-tab]');
-  if (tab){ state.view = tab.dataset.tab; render(); return; }
+  if (tab){
+    const dest = tab.dataset.tab;
+    if (dest === 'add'){
+      // Always start a fresh add form from the tab bar (not an edit-in-progress)
+      state.form = newForm();
+      state.editingId = null;
+      state.extractStatus = null;
+    }
+    state.view = dest;
+    render();
+    return;
+  }
 
   const textSizeBtn = t.closest('[data-textsize]');
   if (textSizeBtn){
     const size = textSizeBtn.dataset.textsize;
     state.textSize = size;
     saveTextSize(size);
+    render();
     return;
   }
 
