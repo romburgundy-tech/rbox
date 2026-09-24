@@ -362,10 +362,23 @@ function render(){
   }
 }
 
-/* BUG FIX #1-4: Only re-render Firestore listeners if not actively editing a form */
+/* BUG FIX #1-4 (revised): The previous version of this guard only checked
+   state.editingId/state.form, which protects the recipe add/edit screen but
+   nothing else — the "new category" field on the Categories tab, the admin
+   "reassign recipes" dropdown, and any select/file-picker that happens to be
+   open at the moment a Firestore snapshot lands were all still vulnerable to
+   having the DOM ripped out from under them mid-interaction (which is what
+   causes typed text to vanish and native <select>/file dialogs to close).
+   This version checks reality directly: is the user's focus currently inside
+   any input, textarea, or select anywhere in the app? If so, skip the
+   re-render no matter which screen they're on. Once they blur/tab away, the
+   next Firestore update renders normally. */
 function shouldRenderOnFirestoreUpdate(){
-  // Don't re-render if user is actively typing in a form
-  return !state.editingId && !state.form;
+  const active = document.activeElement;
+  const appEl = document.getElementById('app');
+  const isEditingSomething = !!(active && appEl && appEl.contains(active) &&
+    ['INPUT','TEXTAREA','SELECT'].includes(active.tagName));
+  return !isEditingSomething;
 }
 
 /* ---- Profile (local to this device) ---- */
