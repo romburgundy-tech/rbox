@@ -98,207 +98,213 @@
   .planbtn.active{background:var(--sage);border-color:var(--sage);color:#fff;}
 
   .empty{padding:60px 30px;text-align:center;color:var(--ink-soft);}
-  .empty h3{font-size:19px;margin-bottom:8px;color:var(--ink);}
-  .empty p{font-size:14px;line-height:1.5;margin:0;}
+
+  /* ---- Detail view / photo hero ---- */
+  .photohero{width:100%;height:300px;object-fit:cover;display:block;background:#EFE7D4;}
+  .photohero.placeholder{display:flex;align-items:center;justify-content:center;font-size:80px;color:#E3D9C4;}
+  .detailbody{padding:20px;}
+  .detailbody h1{font-size:28px;margin-bottom:8px;line-height:1.15;}
+  .metaline{font-size:13px;color:var(--ink-soft);margin-bottom:14px;display:flex;gap:12px;flex-wrap:wrap;}
+  .metaline a{color:var(--sage-dark);text-decoration:none;border-bottom:1px solid var(--sage-dark);}
+  .sectionlabel{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);margin-top:18px;margin-bottom:8px;}
+  .ingline,.stepline{display:flex;gap:10px;margin-bottom:10px;font-size:15px;line-height:1.5;}
+  .ingline .dot{width:6px;height:6px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:6px;}
+  .stepline .stepnum{min-width:24px;text-align:center;color:var(--sage);font-weight:600;flex-shrink:0;}
+
+  /* ---- Add/edit view ---- */
+  .screenhead{padding:calc(14px + var(--safe-t)) 20px 8px;display:flex;align-items:center;gap:8px;position:relative;z-index:4;}
+  .screenhead h2{flex:1;font-size:18px;margin:0;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);margin-bottom:6px;}
+  .field input,.field textarea,.field select{
+    width:100%;padding:12px;border:1px solid var(--line-strong);border-radius:10px;
+    font-size:15px;line-height:1.5;color:var(--ink);background:var(--card);
+  }
+  .field textarea{resize:vertical;min-height:100px;font-family:inherit;}
+  .field select{cursor:pointer;}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
+  .urlrow{display:flex;gap:8px;}
+  .urlrow input{flex:1;}
+  .urlrow button{flex-shrink:0;}
+  .photopicker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .photoopt{
+    border:2px solid var(--line-strong);border-radius:12px;overflow:hidden;
+    aspect-ratio:1;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;
+  }
+  .photoopt.empty{flex-direction:column;color:var(--ink-soft);}
+  .photoopt.empty input{display:none;}
+  .photoopt.selected{border-color:var(--sage);background:rgba(92,110,72,0.08);}
+  .photoopt img{width:100%;height:100%;object-fit:cover;}
+  .photoopt .lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:4px;text-align:center;}
+
+  /* ---- Buttons ---- */
+  .btn{
+    border:none;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:600;
+    cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line-strong);
+    transition:all 0.15s;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn.primary{background:var(--sage);border-color:var(--sage);color:#fff;}
+  .btn.danger{background:#F5E5E3;border-color:#F5E5E3;color:var(--jam);}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .actionrow{display:flex;gap:10px;margin-top:20px;}
+  .toplink{
+    background:none;border:none;color:var(--sage-dark);font-size:13px;
+    padding:4px 0;cursor:pointer;text-decoration:underline;font-weight:500;
+  }
+  .toplink:active{opacity:0.7;}
+
+  /* ---- Status & spinner ---- */
+  .status{
+    padding:12px;border-radius:10px;background:#F0F0F0;color:var(--ink);font-size:14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .status.error{background:#F5E5E3;color:var(--jam);}
+  .spinner{
+    width:16px;height:16px;border:2px solid var(--line-strong);border-top-color:var(--ink);
+    border-radius:50%;animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---- Meal plan view ---- */
+  .planlist{padding:0 20px;}
+  .planrow{
+    display:flex;gap:12px;align-items:center;padding:12px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;
+  }
+  .planrow img{width:56px;height:56px;border-radius:10px;object-fit:cover;}
+  .planrow .pt{flex:1;font-size:15px;color:var(--ink);cursor:pointer;}
+  .planrow .pt:active{opacity:0.7;}
+  .planrow .iconbtn{border-color:var(--line-strong);}
+
+  /* ---- Grocery list ---- */
+  .grocerylist{padding:0 20px;}
+  .groceryitem{
+    display:flex;gap:10px;align-items:flex-start;padding:12px;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+    cursor:pointer;
+  }
+  .groceryitem:active{background:#FBF6EC;}
+  .groceryitem.checked{opacity:0.6;}
+  .groceryitem.checked .gcheck{color:var(--sage);}
+  .gcheck{
+    min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--line-strong);border-radius:4px;color:transparent;font-size:12px;font  weight:600;flex-shrink:0;
+  }
+  .groceryitem.checked .gcheck{border-color:var(--sage);}
+  .grocerysrc{
+    display:block;font-size:11px;color:var(--ink-soft);margin-top:2px;font-style:italic;
+  }
+
+  /* ---- Category view ---- */
+  .catgrid{display:grid;grid-template-columns:1fr;gap:8px;padding:0 20px 20px;}
+  .cattile{
+    padding:20px;border-radius:14px;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:space-between;min-height:100px;
+  }
+  .cattile:active{opacity:0.85;}
+  .cn{font-size:18px;font-weight:600;font-family:'Fraunces',serif;}
+  .cc{font-size:13px;opacity:0.8;margin-top:8px;}
+
+  /* ---- Me (profile) tab ---- */
+  .profilesection{padding:20px;}
+  .profilesection .field{margin-bottom:12px;}
+  .profilesection h3{font-size:14px;font-weight:600;margin-top:20px;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);}
+  .sizepicker{display:flex;gap:8px;}
+  .sizepicker button{flex:1;padding:8px 12px;border:1px solid var(--line-strong);background:var(--card);border-radius:8px;font-size:13px;cursor:pointer;}
+  .sizepicker button.active{background:var(--sage);border-color:var(--sage);color:#fff;}
+
+  /* ---- Admin section ---- */
+  .adminsection{padding:20px;margin-top:20px;background:rgba(162,57,47,0.05);border:1px solid rgba(162,57,47,0.15);border-radius:12px;}
+  .adminsection h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--jam);margin-bottom:12px;}
+  .newcatrow{display:flex;gap:8px;}
+  .newcatrow input{flex:1;}
+  .newcatrow button{flex-shrink:0;}
+  .personrow{display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:8px;}
+  .personrow select{max-width:150px;}
+  .personrow .danger{font-size:12px;padding:6px 10px;}
+
+  /* ---- Share modal ---- */
+  #modalBg{
+    position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;
+    z-index:100;padding:20px;
+  }
+  #modalBg.active{display:flex;}
+  #shareModal{
+    background:var(--card);border-radius:20px;padding:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;
+  }
+  #shareModal h2{margin-top:0;margin-bottom:14px;}
+  #shareModal .field{margin-bottom:12px;}
+  #shareModal textarea{height:100px;min-height:100px;}
+  #shareModal .btnrow{display:flex;gap:8px;margin-top:14px;}
+  #shareModal .btnrow button{flex:1;padding:10px 12px;font-size:13px;}
+
+  /* ---- Splash screen ---- */
+  .splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;}
+  .splash h1{margin:20px 0 12px;font-size:32px;}
+  .splash .field{max-width:300px;margin:20px auto 0;}
+  .splash .btn{width:100%;}
+  .splash .loading{display:flex;align-items:center;gap:8px;}
 
   /* ---- Tab bar ---- */
   .tabbar{
-    position:fixed;bottom:0;left:0;right:0;
-    max-width:520px;margin:0 auto;
-    background:rgba(247,242,231,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border-top:1px solid var(--line-strong);
-    display:flex;padding:8px 4px calc(8px + var(--safe-b));
+    position:fixed;bottom:0;left:0;right:0;display:flex;border-top:1px solid var(--line);
+    background:var(--parchment);z-index:10;padding-bottom:var(--safe-b);
   }
   .tab{
-    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-    background:none;border:none;color:var(--ink-soft);padding:5px 0;min-width:0;
+    flex:1;padding:10px;text-align:center;border:none;background:none;cursor:pointer;
+    font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;
+    color:var(--ink-soft);
   }
-  .tab.active{color:var(--sage-dark);}
-  .tab span{font-size:9.5px;font-weight:600;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.02em;}
-  .tab svg{width:19px;height:19px;}
-
-  /* ---- Detail / Add views ---- */
-  .screen{padding:0 0 30px;}
-  .screenhead{
-    display:flex;align-items:center;gap:10px;padding:calc(16px + var(--safe-t)) 20px 10px;
-  }
-  .screenhead h2{font-size:20px;font-weight:600;flex:1;}
-
-  .photohero{width:100%;aspect-ratio:4/3;object-fit:cover;background:#EFE7D4;border-bottom:1px solid var(--line);}
-  .photohero.placeholder{display:flex;align-items:center;justify-content:center;color:#C9BC9D;}
-  .detailbody{padding:20px;}
-  .detailbody h1{font-size:26px;line-height:1.15;margin-bottom:8px;}
-  .metaline{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:20px;display:flex;gap:14px;flex-wrap:wrap;}
-  .metaline a{color:var(--sage-dark);text-decoration:none;border-bottom:1px dashed var(--sage);}
-  .sectionlabel{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-dark);font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
-  .sectionlabel::after{content:"";flex:1;height:1px;background:var(--line-strong);}
-  .ingline{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;}
-  .ingline:last-child{border-bottom:none;}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:8px;flex-shrink:0;}
-  .stepline{display:flex;gap:12px;padding:10px 0;font-size:15px;line-height:1.55;border-bottom:1px solid var(--line);}
-  .stepline:last-child{border-bottom:none;}
-  .stepnum{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--jam);flex-shrink:0;width:22px;}
-
-  .actionrow{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;}
-  .btn{
-    border-radius:12px;padding:13px 16px;font-size:14.5px;font-weight:600;border:1px solid var(--line-strong);
-    background:var(--card);color:var(--ink);flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
-    min-width:120px;
-  }
-  .btn.primary{background:var(--sage);border-color:var(--sage);color:#fff;}
-  .btn.danger{background:transparent;border-color:var(--jam);color:var(--jam);}
-  .btn:active{transform:scale(0.97);}
-  .btn:disabled{opacity:0.5;}
-
-  /* ---- Forms ---- */
-  .field{margin-bottom:16px;}
-  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);margin-bottom:7px;font-weight:600;}
-  .field input[type=text], .field input[type=url], .field textarea, .field select{
-    width:100%;border:1px solid var(--line-strong);background:var(--card);border-radius:10px;
-    padding:12px 13px;font-size:15px;color:var(--ink);outline:none;
-  }
-  .field textarea{resize:vertical;min-height:110px;line-height:1.5;}
-  .field .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.4;}
-  .urlrow{display:flex;gap:8px;}
-  .urlrow input{flex:1;}
-  .urlrow button{
-    background:var(--sage);color:#fff;border:none;border-radius:10px;padding:0 16px;font-weight:600;font-size:13.5px;
-  }
-  .urlrow button:disabled{opacity:0.5;}
-
-  .photopicker{display:flex;gap:10px;margin-bottom:16px;}
-  .photoopt{
-    flex:1;border-radius:12px;border:2px solid var(--line);overflow:hidden;position:relative;aspect-ratio:1;background:#EFE7D4;
-  }
-  .photoopt.selected{border-color:var(--sage);}
-  .photoopt img{width:100%;height:100%;object-fit:cover;}
-  .photoopt .lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(43,35,24,0.68);color:#fff;font-size:10.5px;text-align:center;padding:5px 0;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.04em;}
-  .photoopt.empty{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-direction:column;gap:6px;font-size:12px;border-style:dashed;}
-  .photoopt input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
-
-  .status{padding:14px;border-radius:12px;background:#EFE9D8;font-size:13.5px;color:var(--ink-soft);display:flex;align-items:center;gap:10px;margin-bottom:16px;line-height:1.4;}
-  .status.error{background:#F5DEDB;color:#8A3128;}
-  .spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.15);border-top-color:var(--sage-dark);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-
-  /* ---- Onboarding ---- */
-  .onboard{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:30px;}
-  .onboard .mark{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:12px;line-height:1.15;}
-  .marklogo{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;}
-  .onboard .sub{color:var(--ink-soft);font-size:15px;line-height:1.5;margin-bottom:30px;}
-  .onboard input{width:100%;border:1px solid var(--line-strong);background:var(--card);border-radius:12px;padding:15px;font-size:16px;margin-bottom:14px;outline:none;}
-  .onboard button{width:100%;background:var(--sage);color:#fff;border:none;border-radius:12px;padding:15px;font-weight:600;font-size:15.5px;}
-  .onboard button:disabled{opacity:0.5;}
-
-  /* ---- Me / share modal ---- */
-  .mecard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:0 20px 16px;}
-  .mecard .name{font-family:'Fraunces',serif;font-size:22px;font-weight:600;display:flex;align-items:center;gap:8px;}
-  .adminbadge{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;background:var(--jam);color:#fff;padding:2px 8px;border-radius:999px;letter-spacing:0.04em;}
-  .mecard .role{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
-  .infoblock{margin:0 20px 16px;padding:16px 18px;background:#EFE9D8;border-radius:14px;font-size:13.5px;line-height:1.55;color:#4a4335;}
-  .infoblock b{color:var(--ink);}
-
-  .modalbg{position:fixed;inset:0;background:rgba(43,35,24,0.5);display:flex;align-items:flex-end;z-index:50;}
-  .modal{background:var(--card);width:100%;max-width:520px;margin:0 auto;border-radius:20px 20px 0 0;padding:22px 20px calc(24px + var(--safe-b));max-height:80vh;overflow-y:auto;}
-  .modal h3{font-size:18px;margin-bottom:12px;}
-  .modal textarea{width:100%;min-height:180px;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-size:13.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;color:var(--ink);background:#FBF6EC;}
-
-  .toplink{display:flex;align-items:center;gap:6px;color:var(--sage-dark);font-size:13.5px;font-weight:600;background:none;border:none;padding:4px 0;}
-
-  /* ---- Text size control ---- */
-  .sizerow{display:flex;gap:8px;margin:0 20px 16px;}
-  .sizebtn{flex:1;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:10px 0;font-family:'Fraunces',serif;font-weight:600;color:var(--ink);}
-  .sizebtn.active{background:var(--sage);border-color:var(--sage);color:#fff;}
-  .sizebtn.s1{font-size:13px;} .sizebtn.s2{font-size:15px;} .sizebtn.s3{font-size:17px;} .sizebtn.s4{font-size:19px;}
-
-  /* ---- Admin panel ---- */
-  .adminpanel{margin:0 20px 16px;padding:16px 18px;background:#F5E4E1;border:1px solid #E3B9B0;border-radius:14px;}
-  .adminpanel h4{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:#8A3128;font-weight:700;margin-bottom:12px;}
-  .rosterrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #E3B9B0;flex-wrap:wrap;}
-  .rosterrow:last-child{border-bottom:none;}
-  .rostername{font-weight:600;font-size:14px;flex:1;min-width:80px;}
-  .rostercount{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
-  .rosterrow select{font-size:12px;padding:6px 8px;border-radius:8px;border:1px solid var(--line-strong);background:#fff;}
-  .rosterrow button{font-size:11px;padding:6px 10px;border-radius:8px;border:1px solid var(--line-strong);background:#fff;font-weight:600;}
-  .rosterrow button:disabled{opacity:0.4;}
-  .newcatrow{display:flex;gap:8px;margin-bottom:14px;}
-  .newcatrow input{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-size:13px;}
-  .newcatrow button{background:var(--sage);color:#fff;border:none;border-radius:8px;padding:0 14px;font-weight:600;font-size:12.5px;}
-
-  /* ---- Categories browse ---- */
-  .catgrid{padding:4px 20px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-  .cattile{border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:4px;}
-  .cattile .cn{font-family:'Fraunces',serif;font-size:16px;font-weight:600;}
-  .cattile .cc{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;opacity:0.75;}
-
-  /* ---- Meal plan / grocery ---- */
-  .planlist{padding:4px 20px 20px;display:flex;flex-direction:column;gap:10px;}
-  .planrow{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;}
-  .planrow img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#EFE7D4;flex-shrink:0;}
-  .planrow .pt{font-family:'Fraunces',serif;font-size:15px;font-weight:600;flex:1;min-width:0;}
-  .grocerylist{padding:4px 20px 30px;}
-  .groceryitem{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px;}
-  .groceryitem.checked{color:var(--ink-soft);text-decoration:line-through;}
-  .gcheck{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
-  .groceryitem.checked .gcheck{background:var(--sage);border-color:var(--sage);color:#fff;}
-  .grocerysrc{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;display:block;margin-top:2px;}
+  .tab.active{color:var(--sage);}
 </style>
-
 </head>
 <body>
 <div id="app"></div>
+<div id="modalBg">
+  <div id="shareModal"></div>
+</div>
 
 <script type="module">
-import { firebaseConfig, WORKER_URL } from './firebase-config.js';
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
+  initializeApp, getAuth, signInAnonymously, onAuthStateChanged,
   getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy,
+  getStorage, ref, uploadString, getDownloadURL, deleteObject,
   arrayUnion, arrayRemove
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {
-  getStorage, ref, uploadString, getDownloadURL, deleteObject
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import {
-  getAuth, signInAnonymously, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
+import { connectAuthEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+import { connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js';
+import { connectStorageEmulator } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js';
+import firebaseConfig from './firebase-config.js';
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth(app);
-
-/* ---------------- Admin ---------------- */
-const ADMIN_NAMES = ['ramy','jennifer'];
-function isAdmin(s){ return !!(s.profile && ADMIN_NAMES.includes(s.profile.name.trim().toLowerCase())); }
-
-/* ---------------- Icons ---------------- */
-const ICON = {
-  search:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
-  chevron:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`,
-  back:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
-  book:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
-  plus:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
-  user:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-  pot:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-1.2 8.4A2 2 0 0 1 16.8 20H7.2a2 2 0 0 1-2-1.6L4 10z"/><path d="M2 10h20M8 10V7a4 4 0 0 1 8 0v3"/></svg>`,
-  camera:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
-  share:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>`,
-  pencil:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`,
-  trash:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`,
-  wand:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M3 21l9-9M12.2 6.2L11 5"/></svg>`,
-  tag:`<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.9L12 21.5l-9.5-9.5L2 3l9.5.5z"/><circle cx="7.3" cy="7.3" r="1.5"/></svg>`,
-  calendar:`<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h2M14 14h2M8 17h2M14 17h2"/></svg>`,
-  cart:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>`,
-  check:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+window.CATEGORY_STYLE = {
+  "Breakfast": {bg:"#D4EBD9",fg:"#1B4D1B"},
+  "Main Dish": {bg:"#E8D5C4",fg:"#6B3E1F"},
+  "Side Dish": {bg:"#C8E6C9",fg:"#2E5F2E"},
+  "Soup": {bg:"#F0D4D4",fg:"#8B3A3A"},
+  "Salad": {bg:"#D9E8D1",fg:"#4A6D3C"},
+  "Sauce": {bg:"#F5DDB0",fg:"#8B6914"},
+  "Dessert": {bg:"#F5D7E8",fg:"#9B3D7F"},
+  "Baking & Bread": {bg:"#F5E3D0",fg:"#9B5E2E"},
+  "Drinks": {bg:"#C8E2F0",fg:"#1F5E8B"},
+  "Appetizer & Snack": {bg:"#E0D4F0",fg:"#5B3D8B"},
+  "Other": {bg:"#E3E3E3",fg:"#6B6152"},
 };
 
-/* ---------------- Local device preferences ---------------- */
-function loadTextSize(){ try{ return localStorage.getItem('recipebox_textsize') || 'default'; }catch(e){ return 'default'; } }
-function saveTextSize(v){ try{ localStorage.setItem('recipebox_textsize', v); }catch(e){} }
-function loadSort(){ try{ return localStorage.getItem('recipebox_sort') || 'new'; }catch(e){ return 'new'; } }
-function saveSort(v){ try{ localStorage.setItem('recipebox_sort', v); }catch(e){} }
-document.documentElement.setAttribute('data-textsize', loadTextSize());
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const ADMIN_NAMES = ['ramy', 'jennifer'];
+const WORKER_URL = 'https://recipe-box-worker.romburgundy.workers.dev';
+let recipes = [];
 
-/* ---------------- State ---------------- */
+if (location.hostname === 'localhost'){
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, 'localhost', 8080);
+  connectStorageEmulator(storage, 'localhost', 9199);
+}
+
 let state = {
   loading: true,
   authReady: false,
@@ -322,6 +328,8 @@ let state = {
   saving: false,
   shareModal: null,
   textSize: loadTextSize(),
+  // NEW: Track if form data was synced since last render
+  lastFormSyncTime: 0,
 };
 
 function render(){
@@ -332,6 +340,7 @@ function render(){
     focusInfo = { id: active.id, start: active.selectionStart, end: active.selectionEnd };
   }
   appEl.innerHTML = viewFor(state);
+  // Restore focus and cursor position
   if (focusInfo){
     const el = document.getElementById(focusInfo.id);
     if (el){
@@ -343,7 +352,13 @@ function render(){
   }
 }
 
-/* ---------------- Profile (local to this device) ---------------- */
+/* BUG FIX #1-4: Only re-render Firestore listeners if not actively editing a form */
+function shouldRenderOnFirestoreUpdate(){
+  // Don't re-render if user is actively typing in a form
+  return !state.editingId && !state.form;
+}
+
+/* ---- Profile (local to this device) ---- */
 function loadProfile(){
   try{ const v = localStorage.getItem('recipebox_profile'); return v ? JSON.parse(v) : null; }
   catch(e){ return null; }
@@ -354,202 +369,98 @@ async function registerInRoster(name){
   try{ await setDoc(doc(db,'meta','roster'), { names: arrayUnion(name) }, { merge:true }); }catch(e){ console.error(e); }
 }
 
-/* ---------------- Firestore live sync ---------------- */
-function startRecipeSync(){
-  const q = query(collection(db, 'recipes'), orderBy('createdAt', 'desc'));
-  onSnapshot(q, snap => {
-    state.recipes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    state.loading = false;
-    if (state.view === 'detail' && state.detail){
-      const updated = state.recipes.find(r => r.id === state.detail.id);
-      if (updated) state.detail = updated;
-    }
-    render();
-  }, err => {
-    console.error(err);
-    state.loading = false;
-    render();
-  });
+function loadSort(){
+  try{ const v = localStorage.getItem('recipebox_sort'); return v ? JSON.parse(v) : null; }
+  catch(e){ return null; }
 }
-function startRosterSync(){
-  onSnapshot(doc(db,'meta','roster'), snap => {
-    state.roster = (snap.exists() && snap.data().names) || [];
-    render();
-  }, err => console.error(err));
+function saveSort(s){ localStorage.setItem('recipebox_sort', JSON.stringify(s)); }
+
+function loadTextSize(){
+  try{ const v = localStorage.getItem('recipebox_textsize'); return v || 'normal'; }
+  catch(e){ return 'normal'; }
 }
-function startCategoriesSync(){
-  onSnapshot(doc(db,'meta','categories'), snap => {
-    const list = (snap.exists() && snap.data().list) || [];
-    state.customCategories = Object.fromEntries(list.map(c => [c.name, {bg:c.bg, fg:c.fg}]));
-    render();
-  }, err => console.error(err));
-}
-function startMealPlanSync(uid){
-  onSnapshot(doc(db,'mealplans',uid), snap => {
-    state.mealPlanIds = (snap.exists() && snap.data().recipeIds) || [];
-    render();
-  }, err => console.error(err));
+function saveTextSize(s){
+  localStorage.setItem('recipebox_textsize', s);
+  const html = document.documentElement;
+  html.dataset.textsize = s;
 }
 
-/* ---------------- Boot ---------------- */
-onAuthStateChanged(auth, user => {
-  if (user){
-    state.authReady = true;
-    state.profile = loadProfile();
-    startRecipeSync();
-    startRosterSync();
-    startCategoriesSync();
-    startMealPlanSync(user.uid);
-    if (state.profile) registerInRoster(state.profile.name);
-    render();
-  }
-});
-signInAnonymously(auth).catch(err => {
-  console.error('Auth failed', err);
-  state.loading = false;
-  state.authError = 'Could not connect. Check your Firebase setup in firebase-config.js.';
-  render();
-});
-render();
-
-/* ---------------- Utilities ---------------- */
-function uid(){ return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
-
-/* ---------------- Categories ---------------- */
-const CATEGORIES = ["Breakfast","Main Dish","Side Dish","Soup","Salad","Sauce","Dessert","Baking & Bread","Drinks","Appetizer & Snack","Other"];
-const CATEGORY_STYLE = {
-  "Breakfast": {bg:"#FDF0D5", fg:"#7A4B06"},
-  "Main Dish": {bg:"#FAEEDA", fg:"#633806"},
-  "Side Dish": {bg:"#F1EAD9", fg:"#5C4A2E"},
-  "Soup": {bg:"#E5EEF7", fg:"#1F4E79"},
-  "Salad": {bg:"#EAF3DE", fg:"#27500A"},
-  "Sauce": {bg:"#E7F0E3", fg:"#33502A"},
-  "Dessert": {bg:"#FBEAF0", fg:"#72243E"},
-  "Baking & Bread": {bg:"#F3E8DA", fg:"#6B4423"},
-  "Drinks": {bg:"#E8F0F5", fg:"#2B5C6B"},
-  "Appetizer & Snack": {bg:"#F5E9F5", fg:"#5A2D5A"},
-  "Other": {bg:"#EFEAE0", fg:"#6B6152"},
-};
-const CUSTOM_PALETTE = [
-  {bg:"#E4EEE0", fg:"#2F4A28"}, {bg:"#F3E0DE", fg:"#7A362E"}, {bg:"#DDEAF0", fg:"#1F4F63"},
-  {bg:"#F1E6D5", fg:"#6B4E22"}, {bg:"#ECE0F0", fg:"#4F2E63"}, {bg:"#E9EEDA", fg:"#465A1F"},
-];
-const CATEGORY_KEYWORDS = [
-  ["Dessert", ["cake","cookie","brownie","pie","pudding","ice cream","cheesecake","dessert","chocolate","tart","custard","mousse","banana bread","cupcake"]],
-  ["Baking & Bread", ["bread","loaf","dough","baguette","focaccia","biscuit","roll","sourdough","flatbread","naan","pretzel","scone","muffin"]],
-  ["Breakfast", ["pancake","waffle","omelet","omelette","breakfast","granola","oatmeal","french toast","hash brown","frittata"]],
-  ["Drinks", ["smoothie","cocktail","mocktail","juice","lemonade","milkshake","punch","sangria","iced tea"]],
-  ["Sauce", ["sauce","dressing","marinade","salsa","hummus","dip","chutney","gravy","glaze"]],
-  ["Soup", ["soup","stew","chowder","bisque","broth","chili"]],
-  ["Salad", ["salad","slaw"]],
-  ["Appetizer & Snack", ["appetizer","snack","finger food","bites","skewers"]],
-  ["Side Dish", ["side dish","mashed potatoes","roasted vegetables","rice pilaf"]],
-  ["Main Dish", ["chicken","beef","pork","lamb","fish","salmon","shrimp","pasta","pizza","curry","stir fry","casserole","dinner","roast","taco","burger","meatball","bean","lentil","tofu","steak","meatloaf"]],
-];
-function guessCategory(title, extraText){
-  const hay = ((title||'') + ' ' + (extraText||'')).toLowerCase();
-  for (const [cat, words] of CATEGORY_KEYWORDS){
-    if (words.some(w => hay.includes(w))) return cat;
-  }
-  return "Other";
-}
-function allCategoryStyles(s){ return Object.assign({}, CATEGORY_STYLE, s.customCategories); }
-function allCategoryNames(s){ return [...CATEGORIES, ...Object.keys(s.customCategories)]; }
 async function createCategory(name){
-  name = name.trim();
-  if (!name) return;
-  const existing = allCategoryNames(state);
-  if (existing.some(c => c.toLowerCase() === name.toLowerCase())) return;
-  const color = CUSTOM_PALETTE[Object.keys(state.customCategories).length % CUSTOM_PALETTE.length];
+  if (!name || !name.trim()) return;
+  const list = Object.entries(state.customCategories).map(([nm, sty]) => ({name:nm, bg:sty.bg, fg:sty.fg}));
+  const [r,g,b] = [Math.random()*200+55|0, Math.random()*200+55|0, Math.random()*200+55|0];
+  const bg = `rgb(${r},${g},${b})`, fg = `rgb(255,255,255)`;
+  list.push({name: name.trim(), bg, fg});
   try{
-    await setDoc(doc(db,'meta','categories'), { list: arrayUnion({ name, bg: color.bg, fg: color.fg }) }, { merge:true });
-  }catch(e){ console.error(e); alert('Could not add category — try again.'); }
+    await setDoc(doc(db,'meta','categories'), {list});
+  }catch(e){
+    console.error(e);
+    alert('Could not create category.');
+  }
 }
 
-function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return ''; } }
-
-function resizeImageFile(file, maxW=1000, quality=0.72){
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        if (w > maxW){ h = Math.round(h * (maxW/w)); w = maxW; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-function dataUrlParts(dataUrl){
-  const m = dataUrl.match(/^data:(.*?);base64,(.*)$/);
-  return { mediaType: m[1], data: m[2] };
-}
-
-/* ---------------- Talk to the Cloudflare Worker (keeps the API key secret) ---------------- */
+/* ---- API calls (via Worker) ---- */
 async function authHeader(){
-  const user = auth.currentUser;
-  if (!user) throw new Error('Not signed in yet — give it a second and try again.');
-  const token = await user.getIdToken();
-  return { 'Authorization': 'Bearer ' + token };
+  const tok = await auth.currentUser.getIdToken();
+  return { 'Authorization': `Bearer ${tok}` };
 }
 
 async function extractFromUrl(url){
-  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
+  const cats = allCategoryNames(state);
   const res = await fetch(WORKER_URL + '/extract-url', {
     method: 'POST',
-    headers,
-    body: JSON.stringify({ url, categories: allCategoryNames(state) })
+    headers: Object.assign({'Content-Type':'application/json'}, await authHeader()),
+    body: JSON.stringify({url, categories: cats})
   });
   const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || 'Could not read that page.');
+  if (!res.ok || data.error) throw new Error(data.error || 'Failed to extract.');
   return data;
 }
-async function extractFromImage(dataUrl){
-  const { mediaType, data } = dataUrlParts(dataUrl);
-  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
+async function extractFromImage(dataUrl, mediaType){
+  const cats = allCategoryNames(state);
+  const base64Data = dataUrl.split(',')[1];
   const res = await fetch(WORKER_URL + '/extract-image', {
     method: 'POST',
-    headers,
-    body: JSON.stringify({ mediaType, data, categories: allCategoryNames(state) })
-  });
-  const result = await res.json();
-  if (!res.ok || result.error) throw new Error(result.error || 'Could not read that photo.');
-  return result;
-}
-async function extractFromText(text){
-  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
-  const res = await fetch(WORKER_URL + '/extract-text', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ text, categories: allCategoryNames(state) })
+    headers: Object.assign({'Content-Type':'application/json'}, await authHeader()),
+    body: JSON.stringify({data: base64Data, mediaType, categories: cats})
   });
   const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || 'Could not read that text.');
+  if (!res.ok || data.error) throw new Error(data.error || 'Failed to extract.');
+  return data;
+}
+async function extractFromText(text){
+  const cats = allCategoryNames(state);
+  const res = await fetch(WORKER_URL + '/extract-text', {
+    method: 'POST',
+    headers: Object.assign({'Content-Type':'application/json'}, await authHeader()),
+    body: JSON.stringify({text, categories: cats})
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Failed to extract.');
   return data;
 }
 
+// BUG FIX #6: Improved aggregateGroceryItems with better error handling
 async function aggregateGroceryItems(items){
   const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
-  const res = await fetch(WORKER_URL + '/aggregate-grocery', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ items })
-  });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || 'Could not combine the list.');
-  return data.items || [];
+  try {
+    const res = await fetch(WORKER_URL + '/aggregate-grocery', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ items })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Aggregation failed');
+    if (!data.items || !Array.isArray(data.items)) throw new Error('Invalid response format');
+    return data.items;
+  } catch (error) {
+    console.error('Aggregation error:', error);
+    // Re-throw to be caught by handleGenerateGrocery
+    throw error;
+  }
 }
 
-/* ---------------- Photo storage (Firebase Storage) ---------------- */
+/* ---- Photo storage (Firebase Storage) ---- */
 async function uploadOwnPhoto(id, dataUrl){
   const r = ref(storage, `recipes/${id}/own.jpg`);
   await uploadString(r, dataUrl, 'data_url');
@@ -559,104 +470,108 @@ async function deleteOwnPhoto(id){
   try{ await deleteObject(ref(storage, `recipes/${id}/own.jpg`)); }catch(e){}
 }
 
-/* ---------------- Views ---------------- */
+/* ---- View renderers ---- */
+const ICON = {
+  back:'←',list:'📋',mealplan:'🍽️',me:'👤',add:'➕',
+  search:'🔍',filter:'🎯',categories:'📂',trash:'🗑️',
+  pencil:'✏️',check:'✔',cart:'🛒',share:'↗️',camera:'📷',
+  pot:'🍲',wand:'✨',close:'✕',
+};
+
+function esc(s){ const d = new DOMParser().parseFromString(s,'text/html'); return d.body.textContent||''; }
+function uid(){ return Math.random().toString(36).slice(2); }
+function fmtDate(ts){ if (!ts) return ''; const d = new Date(ts.seconds*1000); return d.toLocaleDateString(); }
+function newForm(){ return { title:'', sourceUrl:'', sourceImageUrl:'', ownPhotoDataUrl:'', chosenPhoto:'source', ingredients:[], instructions:[], ingredientsText:'', instructionsText:'', category:null, addedBy:'' }; }
+
+function isAdmin(s){ return s.profile && s.profile.name && ADMIN_NAMES.includes(s.profile.name.toLowerCase()); }
+function allCategoryNames(s){ return [...Object.keys(CATEGORY_STYLE), ...Object.keys(s.customCategories)]; }
+function allCategoryStyles(s){ return {...CATEGORY_STYLE, ...s.customCategories}; }
+
 function viewFor(s){
-  if (s.authError) return `<div style="padding:60px 30px;text-align:center;color:var(--jam);">${esc(s.authError)}</div>`;
-  if (s.loading) return `<div style="padding:60px;text-align:center;color:var(--ink-soft);">Opening the recipe box…</div>`;
-  if (!s.profile) return onboardView();
-  let body = '';
-  if (s.view === 'list') body = listView(s);
-  else if (s.view === 'add') body = addView(s);
-  else if (s.view === 'detail') body = detailView(s);
-  else if (s.view === 'me') body = meView(s);
-  else if (s.view === 'categories') body = categoriesView(s);
-  else if (s.view === 'mealplan') body = mealPlanView(s);
-  else if (s.view === 'grocery') body = groceryView(s);
-  return body + tabBar(s) + (s.shareModal ? shareModal(s) : '');
+  if (!s.authReady) return `<div class="splash"><div class="loading"><div class="spinner"></div> Checking auth…</div></div>`;
+  if (!s.profile) return splashView(s);
+  const views = {list:listView, detail:detailView, add:addView, categories:categoriesView, mealplan:mealPlanView, grocery:groceryView, me:meView};
+  const v = views[s.view] || listView;
+  return v(s) + tabBar(s);
 }
 
-function onboardView(){
+function splashView(s){
   return `
-  <div class="onboard">
-    <div class="mark"><img src="icons/mark-96.png" alt="" class="marklogo"> The Michael Family Recipe Box</div>
-    <div class="sub">A shared box of family recipes. Add what you know by first name — everyone who opens this site sees what everyone adds.</div>
-    <input id="nameInput" type="text" placeholder="Your first name" autocomplete="given-name">
-    <button id="startBtn" disabled>Open the box</button>
+  <div class="splash">
+    <h1>${ICON.pot}</h1>
+    <h1>Recipe Box</h1>
+    <p>A shared family recipe box — bring your favorites to the table.</p>
+    <div class="field" style="max-width:300px;margin:40px auto 0;">
+      <input id="nameInput" type="text" placeholder="Your first name" maxlength="50">
+    </div>
+    <button class="btn primary" id="startBtn" style="max-width:300px;width:100%;margin-top:20px;" disabled>Start cooking</button>
   </div>`;
 }
 
 function tabBar(s){
-  const tab = (key, icon, label) => `<button class="tab ${s.view===key?'active':''}" data-tab="${key}">${icon}<span>${label}</span></button>`;
-  return `<div class="tabbar">
-    ${tab('list', ICON.book, 'Recipes')}
-    ${tab('categories', ICON.tag, 'Categories')}
-    ${tab('mealplan', ICON.calendar, 'Meals')}
-    ${tab('add', ICON.plus, 'Add')}
-    ${tab('me', ICON.user, 'Me')}
+  const tabs = [
+    {id:'list', label:'Recipes', icon:ICON.list},
+    {id:'categories', label:'Categories', icon:ICON.categories},
+    {id:'mealplan', label:'Meal Plan', icon:ICON.mealplan},
+    {id:'me', label:'Me', icon:ICON.me},
+  ];
+  return `
+  <div class="tabbar">
+    ${tabs.map(t => `<button class="tab ${s.view===t.id?'active':''}" data-tab="${t.id}">${t.icon}</button>`).join('')}
   </div>`;
 }
 
-function tileMarkup(r, s){
-  const thumb = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
-  const styles = allCategoryStyles(s);
-  const cat = r.category && styles[r.category] ? r.category : null;
-  const catStyle = cat ? styles[cat] : null;
-  const inPlan = s.mealPlanIds.includes(r.id);
-  return `
+function listView(s){
+  let filtered = s.recipes;
+  if (s.query) filtered = filtered.filter(r => (r.title||'').toLowerCase().includes(s.query.toLowerCase()));
+  if (s.categoryFilter) filtered = filtered.filter(r => r.category === s.categoryFilter);
+  if (s.filter === 'mine') filtered = filtered.filter(r => (r.addedBy||'').trim() === (s.profile.name||'').trim());
+  
+  const sorted = filtered.sort((a, b) => {
+    if (!s.sort || s.sort === 'recent') return (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0);
+    return (a.title||'').localeCompare(b.title||'');
+  });
+  
+  const tiles = sorted.map(r => {
+    const thumb = r.chosenPhoto === 'own' ? r.ownPhotoUrl : (r.sourceImageUrl || r.ownPhotoUrl);
+    const st = allCategoryStyles(s)[r.category] || CATEGORY_STYLE.Other;
+    const inPlan = s.mealPlanIds.includes(r.id);
+    return `
     <div class="tile" data-open="${r.id}">
-      <button class="planbtn ${inPlan?'active':''}" data-toggleplan="${r.id}" title="${inPlan?'Remove from meal plan':'Add to meal plan'}">${inPlan ? ICON.check : ICON.plus}</button>
-      ${thumb ? `<div class="tilephoto-wrap"><img class="tilephoto" src="${esc(thumb)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="tilephoto placeholder" style="display:none;">${ICON.pot}</div></div>`
-                    : `<div class="tilephoto placeholder">${ICON.pot}</div>`}
+      ${thumb ? `<img class="tilephoto" src="${esc(thumb)}" onerror="this.style.display='none';">` : `<div class="tilephoto placeholder">${ICON.pot}</div>`}
       <div class="tilebody">
         <div class="tiletitle">${esc(r.title)}</div>
-        ${cat ? `<span class="badge" style="background:${catStyle.bg};color:${catStyle.fg};">${esc(cat)}</span>` : ''}
-        <div class="rmeta">${esc(r.addedBy)} · ${fmtDate(r.createdAt)}</div>
+        ${r.category ? `<span class="badge" style="background:${st.bg};color:${st.fg};">${esc(r.category)}</span>` : ''}
+        <div class="rmeta">${esc(r.addedBy||'?')} · ${fmtDate(r.createdAt)}</div>
       </div>
+      <button class="planbtn ${inPlan?'active':''}" data-toggleplan="${r.id}" title="${inPlan?'Remove from meal plan':'Add to meal plan'}">${inPlan ? ICON.check : ICON.plus}</button>
     </div>`;
-}
+  }).join('');
 
-function listView(s){
-  const q = s.query.trim().toLowerCase();
-  const others = [...new Set(s.recipes.map(r => r.addedBy).filter(n => n && n !== s.profile.name))].sort();
-  let items = s.recipes.slice();
-  if (s.filter === 'mine') items = items.filter(r => r.addedBy === s.profile.name);
-  else if (s.filter !== 'all') items = items.filter(r => r.addedBy === s.filter);
-  if (s.categoryFilter) items = items.filter(r => r.category === s.categoryFilter);
-  if (q) items = items.filter(r => (r.title||'').toLowerCase().includes(q));
-  if (s.sort === 'az') items = items.slice().sort((a,b) => (a.title||'').localeCompare(b.title||''));
-
-  const chips = [
-    `<button class="chip ${s.filter==='all'?'active':''}" data-filter="all">All</button>`,
-    `<button class="chip ${s.filter==='mine'?'active':''}" data-filter="mine">Mine</button>`,
-    ...others.map(n => `<button class="chip ${s.filter===n?'active':''}" data-filter="${esc(n)}">${esc(n)}</button>`)
-  ].join('');
-
-  const list = items.length ? items.map(r => tileMarkup(r, s)).join('') : `<div class="empty"><h3>Nothing here yet</h3><p>${q ? 'No recipes match your search.' : 'Recipes added here will show up for the whole family.'}</p></div>`;
-
-  const catBanner = s.categoryFilter ? `
-  <div style="padding:0 20px 8px;display:flex;align-items:center;gap:8px;">
-    <button class="iconbtn" data-clear-category style="width:32px;height:32px;">${ICON.back}</button>
-    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--sage-dark);font-weight:600;">Category: ${esc(s.categoryFilter)}</span>
-  </div>` : '';
-
-  return `
-  <div class="topbar">
-    <div class="brand"><h1>The Michael Family Recipe Box</h1><div class="tag">${s.recipes.length} recipe${s.recipes.length===1?'':'s'} in the family box</div></div>
-  </div>
-  ${catBanner}
+  const viewLayout = `
+  <div class="topbar"><div class="brand"><h1>Recipes</h1><div class="tag">Shared family cooking</div></div></div>
   <div class="searchwrap">
-    <div class="search">${ICON.search}<input id="searchInput" type="text" placeholder="Search recipes by title…" value="${esc(s.query)}"></div>
-    <button class="iconbtn ${s.sort==='az'?'active':''}" id="sortToggle" title="Sort A–Z">Az</button>
+    <div class="search"><span>${ICON.search}</span><input id="searchInput" type="text" placeholder="Search…" value="${esc(s.query)}"></div>
   </div>
-  <div class="chiprow">${chips}</div>
-  <div class="tilegrid">${list}</div>`;
+  <div class="chiprow">
+    <button class="chip ${s.filter==='all'?'active':''}" data-filter="all">All</button>
+    <button class="chip ${s.filter==='mine'?'active':''}" data-filter="mine">My recipes</button>
+    ${s.categoryFilter ? `<button class="chip active" data-clear-category>×${esc(s.categoryFilter)}</button>` : ''}
+  </div>
+  ${s.categoryFilter ? `<div style="padding:0 20px;margin-bottom:8px;"><button class="toplink" data-clear-category>Show all categories</button></div>` : ''}
+  ${sorted.length ? `<div class="tilegrid">${tiles}</div>` : `<div class="empty"><h3>No recipes yet</h3><p>Tap + to add one, or ask someone to share theirs.</p></div>`}
+  `;
+  return viewLayout;
 }
 
 function categoriesView(s){
   const styles = allCategoryStyles(s);
-  const names = allCategoryNames(s);
   const counts = {};
-  s.recipes.forEach(r => { if (r.category) counts[r.category] = (counts[r.category]||0) + 1; });
+  s.recipes.forEach(r => {
+    const cat = r.category || 'Other';
+    counts[cat] = (counts[cat]||0) + 1;
+  });
+  const names = Object.keys(styles).sort();
   const tiles = names.map(n => {
     const st = styles[n] || CATEGORY_STYLE.Other;
     return `<div class="cattile" style="background:${st.bg};color:${st.fg};" data-open-category="${esc(n)}">
@@ -859,107 +774,244 @@ function addView(s){
 }
 
 function meView(s){
-  const mine = s.recipes.filter(r => r.addedBy === s.profile.name).length;
-  const shareUrl = window.location.href.split('?')[0];
   const admin = isAdmin(s);
-
-  const sizeRow = `
-  <div class="sizerow">
-    <button class="sizebtn s1 ${s.textSize==='default'?'active':''}" data-textsize="default">A</button>
-    <button class="sizebtn s2 ${s.textSize==='large'?'active':''}" data-textsize="large">A</button>
-    <button class="sizebtn s3 ${s.textSize==='xl'?'active':''}" data-textsize="xl">A</button>
-  </div>`;
-
-  let adminSection = '';
-  if (admin){
-    const names = [...new Set([...s.roster, ...s.recipes.map(r=>r.addedBy)])].filter(Boolean).sort();
-    const rows = names.map(n => {
-      const count = s.recipes.filter(r => r.addedBy === n).length;
-      const others = names.filter(x => x !== n);
-      return `
-      <div class="rosterrow">
-        <div class="rostername">${esc(n)}</div>
-        <div class="rostercount">${count} recipe${count===1?'':'s'}</div>
-        ${others.length ? `
-        <select data-reassign-from="${esc(n)}">
-          <option value="">Move all to…</option>
-          ${others.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}
-        </select>` : ''}
-        <button data-remove-user="${esc(n)}" ${count>0?'disabled':''} title="${count>0?'Move or delete their recipes first':'Remove from family box'}">Remove</button>
-      </div>`;
-    }).join('');
-    adminSection = `
-    <div class="adminpanel">
-      <h4>Manage family (admin)</h4>
-      ${rows}
-    </div>`;
-  }
-
   return `
-  <div class="topbar"><div class="brand"><h1>Me</h1></div></div>
-  <div class="mecard">
-    <div class="name">${esc(s.profile.name)} ${admin ? '<span class="adminbadge">Admin</span>' : ''}</div>
-    <div class="role">${mine} recipe${mine===1?'':'s'} added</div>
-    <button class="toplink" id="changeNameBtn" style="margin-top:12px;">Change name</button>
-  </div>
-  <div class="infoblock">
-    <b>Text size</b><br>
-    Make everything bigger and easier to read on this device.
-  </div>
-  ${sizeRow}
-  ${adminSection}
-  <div class="infoblock">
-    <b>Sharing with family &amp; friends</b><br>
-    Everyone who opens this same web address shares one recipe box — whatever you add, they see, and whatever they add, you see. Send them this link:<br>
-    <span style="word-break:break-all;color:var(--ink);">${esc(shareUrl)}</span>
-    <div style="margin-top:10px;"><button class="toplink" id="copyLinkBtn">Copy this link</button></div>
-  </div>
-  <div class="infoblock">
-    <b>Sending a single recipe</b><br>
-    Open any recipe and tap the share icon to copy a clean, text-only version of it (ingredients, steps, and the original link) to send by text or email — even to people who don't have this site open.
-  </div>`;
-}
-
-function shareModal(s){
-  return `<div class="modalbg" id="modalBg">
-    <div class="modal">
-      <h3>${esc(s.shareModal.title)}</h3>
-      <textarea id="shareText" readonly>${esc(s.shareModal.text)}</textarea>
-      <div class="actionrow">
-        <button class="btn primary" id="copyShareBtn">Copy text</button>
-        <button class="btn" id="closeShareBtn">Close</button>
-      </div>
+  <div class="topbar"><div class="brand"><h1>Me</h1><div class="tag">Your account</div></div></div>
+  <div class="profilesection">
+    <h3>Your name</h3>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div style="font-size:16px;font-weight:600;">${esc(s.profile.name)}</div>
+      <button class="toplink" id="changeNameBtn" style="margin:0;">Change</button>
     </div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">This name appears next to recipes you add. Other people can see it.</p>
+
+    <h3>Text size</h3>
+    <div class="sizepicker">
+      <button class="sizepicker-btn ${s.textSize==='normal'?'active':''}" data-textsize="normal">A</button>
+      <button class="sizepicker-btn ${s.textSize==='large'?'active':''}" data-textsize="large" style="font-size:18px;">A</button>
+      <button class="sizepicker-btn ${s.textSize==='xl'?'active':''}" data-textsize="xl" style="font-size:22px;">A</button>
+    </div>
+
+    <h3>App version</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin:0;">Recipe Box v2.0</p>
+
+    <h3>Share this app</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:0;">Invite others to add their recipes.</p>
+    <button class="btn" id="shareAppBtn" style="width:100%;">${ICON.share} Copy app link</button>
+
+    ${admin ? `
+    <div class="adminsection">
+      <h3>${ICON.pencil} Admin controls</h3>
+      <div class="field">
+        <label>Manage people in the box</label>
+        <div style="max-height:300px;overflow-y:auto;">
+          ${s.roster.sort().map(n => `
+          <div class="personrow">
+            <div>${esc(n)}</div>
+            <div style="display:flex;gap:8px;">
+              <select data-reassign-from="${esc(n)}" style="font-size:12px;">
+                <option value="">Move recipes…</option>
+                ${s.roster.filter(x => x !== n).map(x => `<option value="${esc(x)}">→ ${esc(x)}</option>`).join('')}
+              </select>
+              <button class="btn danger" data-remove-user="${esc(n)}" style="font-size:12px;padding:6px 10px;">Remove</button>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>` : ''}
   </div>`;
 }
 
-/* ---------------- Actions ---------------- */
-function newForm(){
-  return { title:'', sourceUrl:'', sourceImageUrl:null, ownPhotoDataUrl:null, chosenPhoto:'source', ingredients:[], instructions:[], ingredientsText:'', instructionsText:'', category:null, addedBy:null };
+/* ---- Firestore live sync (with guard to avoid wiping form state) ---- */
+let lastRecipeSync = {};
+function startRecipeSync(){
+  const q = query(collection(db, 'recipes'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, snap => {
+    state.recipes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    state.loading = false;
+    if (state.view === 'detail' && state.detail){
+      const updated = state.recipes.find(r => r.id === state.detail.id);
+      if (updated) state.detail = updated;
+    }
+    // BUG FIX: Only render if not actively editing
+    if (shouldRenderOnFirestoreUpdate()) {
+      render();
+    }
+  }, err => {
+    console.error(err);
+    state.loading = false;
+    if (shouldRenderOnFirestoreUpdate()) {
+      render();
+    }
+  });
 }
 
-function openDetail(id){
-  const rec = state.recipes.find(r => r.id === id);
-  state.view = 'detail'; state.detail = rec || null; render();
+function startRosterSync(){
+  onSnapshot(doc(db,'meta','roster'), snap => {
+    state.roster = (snap.exists() && snap.data().names) || [];
+    // BUG FIX: Only render if not actively editing
+    if (shouldRenderOnFirestoreUpdate()) {
+      render();
+    }
+  }, err => console.error(err));
 }
+
+function startCategoriesSync(){
+  onSnapshot(doc(db,'meta','categories'), snap => {
+    const list = (snap.exists() && snap.data().list) || [];
+    state.customCategories = Object.fromEntries(list.map(c => [c.name, {bg:c.bg, fg:c.fg}]));
+    // BUG FIX: Only render if not actively editing
+    if (shouldRenderOnFirestoreUpdate()) {
+      render();
+    }
+  }, err => console.error(err));
+}
+
+function startMealPlanSync(uid){
+  onSnapshot(doc(db,'mealplans',uid), snap => {
+    state.mealPlanIds = (snap.exists() && snap.data().recipeIds) || [];
+    // BUG FIX: Only render if not actively editing
+    if (shouldRenderOnFirestoreUpdate()) {
+      render();
+    }
+  }, err => console.error(err));
+}
+
+/* ---- Boot ---- */
+onAuthStateChanged(auth, user => {
+  if (!user){
+    signInAnonymously(auth).catch(e => {
+      console.error('Auth error:', e);
+      state.loading = false;
+      state.authReady = true;
+      render();
+    });
+    return;
+  }
+  state.authReady = true;
+  let p = loadProfile();
+  if (!p){
+    render();
+    return;
+  }
+  state.profile = p;
+  state.recipes = [];
+  startRecipeSync();
+  startRosterSync();
+  startCategoriesSync();
+  startMealPlanSync(user.uid);
+  registerInRoster(p.name);
+  render();
+});
+
 function goList(){ state.view='list'; state.detail=null; state.editingId=null; state.form=null; state.extractStatus=null; render(); }
 
-async function toggleMealPlan(recipeId){
-  const user = auth.currentUser;
-  if (!user) return;
-  const has = state.mealPlanIds.includes(recipeId);
-  state.mealPlanIds = has ? state.mealPlanIds.filter(id => id !== recipeId) : [...state.mealPlanIds, recipeId];
+/* ---- Handle recipe save ---- */
+async function handleSave(){
+  const f = state.form;
+  if (!f || !f.title || !f.title.trim()){
+    alert('Recipe needs a title.');
+    return;
+  }
+  state.saving = true;
   render();
+  
+  const id = state.editingId || uid();
+  const ingredients = (f.ingredientsText || '').split('\n').map(l => l.trim()).filter(Boolean);
+  const instructions = (f.instructionsText || '').split('\n').map(l => l.trim()).filter(Boolean);
+  
+  let ownPhotoUrl = null;
   try{
-    await setDoc(doc(db,'mealplans',user.uid), { recipeIds: has ? arrayRemove(recipeId) : arrayUnion(recipeId) }, { merge:true });
-  }catch(e){ console.error(e); }
+    if (f.ownPhotoDataUrl && f.ownPhotoDataUrl.startsWith('data:')){
+      ownPhotoUrl = await uploadOwnPhoto(id, f.ownPhotoDataUrl);
+    } else if (state.detail && state.detail.ownPhotoUrl){
+      ownPhotoUrl = state.detail.ownPhotoUrl;
+    }
+  }catch(e){
+    console.error('Photo upload failed:', e);
+  }
+
+  const recipeDoc = {
+    title: f.title.trim(),
+    sourceUrl: f.sourceUrl || null,
+    sourceImageUrl: f.sourceImageUrl || null,
+    ownPhotoUrl,
+    chosenPhoto: f.chosenPhoto || 'source',
+    ingredients,
+    instructions,
+    category: f.category || 'Other',
+    addedBy: f.addedBy || state.profile.name,
+    ...(state.editingId ? {} : { createdAt: new Date() })
+  };
+  
+  try{
+    await setDoc(doc(db, 'recipes', id), recipeDoc, { merge: !state.editingId });
+    state.saving = false;
+    goList();
+  }catch(e){
+    console.error(e);
+    state.saving = false;
+    alert('Could not save recipe.');
+    render();
+  }
 }
 
+async function handleDelete(){
+  const r = state.detail;
+  if (!r) return;
+  if (!confirm(`Delete "${r.title}"?`)) return;
+  try{
+    if (r.ownPhotoUrl) await deleteOwnPhoto(r.id);
+    await deleteDoc(doc(db, 'recipes', r.id));
+    goList();
+  }catch(e){
+    console.error(e);
+    alert('Could not delete recipe.');
+  }
+}
+
+async function reassignRecipes(fromName, toName){
+  if (!toName || !toName.trim()) return;
+  const toReassign = recipes.filter(r => (r.addedBy||'').trim() === fromName.trim());
+  if (!toReassign.length){
+    alert('No recipes to move.');
+    return;
+  }
+  if (!confirm(`Move ${toReassign.length} recipe${toReassign.length===1?'':'s'} from ${fromName} to ${toName}?`)) return;
+  for (const r of toReassign){
+    try{ await setDoc(doc(db, 'recipes', r.id), { addedBy: toName }, { merge: true }); }catch(e){ console.error(e); }
+  }
+}
+
+async function deleteAllRecipesForUser(name){
+  const toDelete = recipes.filter(r => (r.addedBy||'').trim() === name.trim());
+  if (!toDelete.length) return;
+  for (const r of toDelete){
+    try{
+      if (r.ownPhotoUrl) await deleteOwnPhoto(r.id);
+      await deleteDoc(doc(db, 'recipes', r.id));
+    }catch(e){ console.error(e); }
+  }
+}
+
+async function removeUser(name){
+  if (!confirm(`Remove ${name}? Their recipes will be deleted too.`)) return;
+  try{
+    await deleteAllRecipesForUser(name);
+    await setDoc(doc(db,'meta','roster'), { names: arrayRemove(name) }, { merge:true });
+  }catch(e){
+    console.error(e);
+    alert('Could not remove user.');
+  }
+}
+
+// BUG FIX #6: Improved handleGenerateGrocery with better error messages
 async function handleGenerateGrocery(){
   const items = state.recipes.filter(r => state.mealPlanIds.includes(r.id));
   const lines = [];
   items.forEach(r => (r.ingredients||[]).forEach(i => lines.push({ text: i, from: r.title })));
   window.__groceryChecked = new Set();
+  
   if (!lines.length){
     state.groceryItems = [];
     state.groceryError = null;
@@ -967,15 +1019,17 @@ async function handleGenerateGrocery(){
     render();
     return;
   }
+  
   state.view = 'grocery';
   state.groceryLoading = true;
   state.groceryError = null;
   render();
+  
   try{
     state.groceryItems = await aggregateGroceryItems(lines);
   }catch(e){
-    console.error(e);
-    // Fall back to a plain grouped (non-aggregated) list so the feature still works.
+    console.error('Aggregation error:', e);
+    // Fall back to a plain grouped (non-aggregated) list so the feature still works
     const grouped = {};
     lines.forEach(l => {
       const key = l.text.trim().toLowerCase();
@@ -990,207 +1044,192 @@ async function handleGenerateGrocery(){
 }
 
 async function handlePasteExtract(){
-  const text = document.getElementById('pasteInput').value.trim();
-  if (!text) return;
-  state.extractStatus = {type:'loading', msg:'Reading the recipe from that text…'};
+  const txt = document.getElementById('pasteInput')?.value;
+  if (!txt || !txt.trim()){ alert('Paste some recipe text first.'); return; }
+  state.extractStatus = {type:'loading', msg:'Reading recipe text…'};
   render();
   try{
-    const data = await extractFromText(text);
-    state.form.title = data.title || state.form.title;
-    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
-    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
-    state.form.ingredientsText = state.form.ingredients.join('\n');
-    state.form.instructionsText = state.form.instructions.join('\n');
-    if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
-    state.extractStatus = {type:'ok', msg:'Recipe pulled from the text — review and edit anything below, and add a photo if you like.'};
-  }catch(e){
-    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that text. Try again or add it by hand.'};
-  }
-  render();
-}
-
-async function handleExtract(){
-  const url = document.getElementById('urlInput').value.trim();
-  if (!url) return;
-  state.extractStatus = {type:'loading', msg:'Reading the page and pulling out the recipe…'};
-  render();
-  try{
-    const data = await extractFromUrl(url);
-    state.form.title = data.title || state.form.title;
-    state.form.sourceUrl = url;
-    state.form.sourceImageUrl = data.imageUrl || null;
-    state.form.chosenPhoto = data.imageUrl ? 'source' : (state.form.ownPhotoDataUrl ? 'own' : 'source');
-    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
-    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
-    state.form.ingredientsText = state.form.ingredients.join('\n');
-    state.form.instructionsText = state.form.instructions.join('\n');
-    if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
-    state.extractStatus = {type:'ok', msg:'Recipe pulled in — review and edit anything below.'};
-  }catch(e){
-    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that page. Try again or add it by hand.'};
-  }
-  render();
-}
-
-async function handleScan(file){
-  state.extractStatus = {type:'loading', msg:'Reading the recipe card…'};
-  render();
-  try{
-    const photoDataUrl = await resizeImageFile(file, 1400, 0.85);
-    const data = await extractFromImage(photoDataUrl);
-    state.form.title = data.title || state.form.title;
-    state.form.sourceUrl = null;
-    state.form.sourceImageUrl = null;
-    state.form.ownPhotoDataUrl = photoDataUrl;
-    state.form.chosenPhoto = 'own';
-    state.form.ingredients = data.ingredients && data.ingredients.length ? data.ingredients : state.form.ingredients;
-    state.form.instructions = data.instructions && data.instructions.length ? data.instructions : state.form.instructions;
-    state.form.ingredientsText = state.form.ingredients.join('\n');
-    state.form.instructionsText = state.form.instructions.join('\n');
-    if (data.category && allCategoryNames(state).includes(data.category)) state.form.category = data.category;
-    state.extractStatus = {type:'ok', msg:'Recipe read from the photo — review and edit anything below.'};
-  }catch(e){
-    state.extractStatus = {type:'error', msg: e.message || 'Something went wrong reading that photo. Try again or add it by hand.'};
-  }
-  render();
-}
-
-async function handleSave(){
-  const title = document.getElementById('titleInput').value.trim();
-  if (!title){ alert('Give the recipe a title first.'); return; }
-  const ingredients = document.getElementById('ingInput').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  const instructions = document.getElementById('stepInput').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  const admin = isAdmin(state);
-  const categorySelectEl = document.getElementById('categorySelect');
-  const ownerSelectEl = document.getElementById('ownerSelect');
-  state.saving = true; render();
-
-  const id = state.editingId || uid();
-  const existing = state.recipes.find(r => r.id === id);
-  const createdAt = existing ? existing.createdAt : Date.now();
-
-  let category;
-  if (admin && categorySelectEl && categorySelectEl.value){
-    category = categorySelectEl.value;
-  } else if (state.form.category && allCategoryNames(state).includes(state.form.category)){
-    category = state.form.category;
-  } else {
-    category = guessCategory(title, ingredients.join(' ') + ' ' + instructions.join(' '));
-  }
-
-  const addedBy = (admin && ownerSelectEl && ownerSelectEl.value) ? ownerSelectEl.value
-                  : (existing ? existing.addedBy : state.profile.name);
-
-  try{
-    let ownPhotoUrl = existing ? existing.ownPhotoUrl || null : null;
-    if (state.form.ownPhotoDataUrl && state.form.ownPhotoDataUrl.startsWith('data:')){
-      ownPhotoUrl = await uploadOwnPhoto(id, state.form.ownPhotoDataUrl);
-    } else if (!state.form.ownPhotoDataUrl){
-      if (existing && existing.ownPhotoUrl) await deleteOwnPhoto(id);
-      ownPhotoUrl = null;
+    const result = await extractFromText(txt);
+    if (!result.title){
+      state.extractStatus = {type:'error', msg:'Could not find a recipe in that text. Try a different source?'};
+      render();
+      return;
     }
-
-    const rec = {
-      title,
-      sourceUrl: state.form.sourceUrl || null,
-      sourceImageUrl: state.form.sourceImageUrl || null,
-      ownPhotoUrl: ownPhotoUrl || null,
-      chosenPhoto: state.form.chosenPhoto || 'source',
-      ingredients, instructions,
-      category,
-      addedBy,
-      createdAt
-    };
-    await setDoc(doc(db, 'recipes', id), rec);
-    state.saving = false;
-    state.view = 'list'; state.form = null; state.editingId = null; state.extractStatus = null;
+    state.form.title = result.title;
+    state.form.ingredients = result.ingredients || [];
+    state.form.ingredientsText = (result.ingredients||[]).join('\n');
+    state.form.instructions = result.instructions || [];
+    state.form.instructionsText = (result.instructions||[]).join('\n');
+    state.form.category = result.category || null;
+    state.extractStatus = null;
+    render();
   }catch(e){
     console.error(e);
-    state.saving = false;
-    alert('Could not save — check your connection and Firebase setup, then try again.');
-  }
-  render();
-}
-
-async function handleDelete(){
-  if (!confirm('Remove this recipe from the family box for everyone?')) return;
-  const id = state.detail.id;
-  try{
-    await deleteDoc(doc(db, 'recipes', id));
-    await deleteOwnPhoto(id);
-  }catch(e){ console.error(e); }
-  goList();
-}
-
-async function reassignRecipes(fromName, toName){
-  if (!toName) return;
-  if (!confirm(`Move all of ${fromName}'s recipes to ${toName}?`)) return;
-  const targets = state.recipes.filter(r => r.addedBy === fromName);
-  try{
-    await Promise.all(targets.map(r => setDoc(doc(db,'recipes',r.id), { addedBy: toName }, { merge:true })));
-  }catch(e){ console.error(e); alert('Could not move all recipes — try again.'); }
-}
-
-async function deleteAllRecipesForUser(name){
-  const targets = state.recipes.filter(r => r.addedBy === name);
-  if (!targets.length) return;
-  if (!confirm(`Delete all ${targets.length} recipe(s) added by ${name}? This can't be undone.`)) return;
-  try{
-    await Promise.all(targets.map(async r => { await deleteDoc(doc(db,'recipes',r.id)); await deleteOwnPhoto(r.id); }));
-  }catch(e){ console.error(e); alert('Could not delete all recipes — try again.'); }
-}
-
-async function removeUser(name){
-  const count = state.recipes.filter(r => r.addedBy === name).length;
-  if (count > 0){ alert('This person still has recipes — move or delete them first.'); return; }
-  if (!confirm(`Remove ${name} from the family box?`)) return;
-  try{ await setDoc(doc(db,'meta','roster'), { names: arrayRemove(name) }, { merge:true }); }
-  catch(e){ console.error(e); }
-}
-
-function openShareForDetail(){
-  const r = state.detail;
-  const lines = [
-    r.title, '',
-    'INGREDIENTS',
-    ...(r.ingredients||[]).map(i=>'• '+i), '',
-    'INSTRUCTIONS',
-    ...(r.instructions||[]).map((i,idx)=>(idx+1)+'. '+i),
-  ];
-  if (r.sourceUrl){ lines.push(''); lines.push('Original recipe: ' + r.sourceUrl); }
-  const text = lines.join('\n');
-  if (navigator.share){
-    navigator.share({title: r.title, text}).catch(()=>{ state.shareModal = {title: r.title, text}; render(); });
-  } else {
-    state.shareModal = {title: r.title, text};
+    state.extractStatus = {type:'error', msg:e.message};
     render();
   }
 }
 
-/* ---------------- Event delegation ---------------- */
+async function handleExtract(){
+  const url = document.getElementById('urlInput')?.value;
+  if (!url || !url.trim()){ alert('Paste a URL first.'); return; }
+  state.extractStatus = {type:'loading', msg:'Reading website…'};
+  render();
+  try{
+    const result = await extractFromUrl(url);
+    if (!result.title){
+      state.extractStatus = {type:'error', msg:'Could not find a recipe on that page. Try another source?'};
+      render();
+      return;
+    }
+    state.form.title = result.title;
+    state.form.sourceUrl = url;
+    state.form.sourceImageUrl = result.imageUrl || null;
+    state.form.ingredients = result.ingredients || [];
+    state.form.ingredientsText = (result.ingredients||[]).join('\n');
+    state.form.instructions = result.instructions || [];
+    state.form.instructionsText = (result.instructions||[]).join('\n');
+    state.form.category = result.category || null;
+    state.extractStatus = null;
+    render();
+  }catch(e){
+    console.error(e);
+    state.extractStatus = {type:'error', msg:e.message};
+    render();
+  }
+}
+
+async function handleScan(file){
+  state.extractStatus = {type:'loading', msg:'Reading photo…'};
+  render();
+  try{
+    const b64 = await resizeImageFile(file);
+    const result = await extractFromImage(b64, 'image/jpeg');
+    if (!result.title){
+      state.extractStatus = {type:'error', msg:'Could not read a recipe from that image.'};
+      render();
+      return;
+    }
+    state.form.title = result.title;
+    state.form.ownPhotoDataUrl = b64;
+    state.form.chosenPhoto = 'own';
+    state.form.ingredients = result.ingredients || [];
+    state.form.ingredientsText = (result.ingredients||[]).join('\n');
+    state.form.instructions = result.instructions || [];
+    state.form.instructionsText = (result.instructions||[]).join('\n');
+    state.form.category = result.category || null;
+    state.extractStatus = null;
+    render();
+  }catch(e){
+    console.error(e);
+    state.extractStatus = {type:'error', msg:e.message};
+    render();
+  }
+}
+
+async function resizeImageFile(file){
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1200;
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim){
+          const ratio = Math.min(maxDim/w, maxDim/h);
+          w = w * ratio; h = h * ratio;
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => rej(new Error('Could not read image'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => rej(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function openDetail(id){
+  const r = state.recipes.find(x => x.id === id);
+  if (r){ state.detail = r; state.view = 'detail'; render(); }
+}
+
+async function openShareForDetail(){
+  const r = state.detail;
+  if (!r) return;
+  const text = `Check out "${r.title}" in the family recipe box! ${window.location.href}`;
+  state.shareModal = {title:r.title, text};
+  render();
+}
+
+function toggleMealPlan(recipeId){
+  const has = state.mealPlanIds.includes(recipeId);
+  state.mealPlanIds = has ? state.mealPlanIds.filter(id => id !== recipeId) : [...state.mealPlanIds, recipeId];
+  const uid = auth.currentUser.uid;
+  setDoc(doc(db, 'mealplans', uid), { recipeIds: state.mealPlanIds }, { merge: true }).catch(e => console.error(e));
+  render();
+}
+
+/* ---- Event listeners ---- */
 document.addEventListener('click', async (e) => {
   const t = e.target;
 
-  if (t.id === 'startBtn' || t.closest('#startBtn')){
-    const val = document.getElementById('nameInput').value.trim();
-    if (!val) return;
-    state.profile = { name: val };
+  if (t.id === 'startBtn'){
+    const name = document.getElementById('nameInput')?.value;
+    if (!name || !name.trim()){ alert('Enter your name first.'); return; }
+    state.profile = { name: name.trim() };
     saveProfile(state.profile);
-    registerInRoster(val);
-    render(); return;
+    state.recipes = [];
+    startRecipeSync();
+    startRosterSync();
+    startCategoriesSync();
+    startMealPlanSync(auth.currentUser.uid);
+    registerInRoster(state.profile.name);
+    render();
+    return;
+  }
+
+  if (t.id === 'extractBtn'){ handleExtract(); return; }
+  if (t.id === 'pasteExtractBtn'){ handlePasteExtract(); return; }
+  if (t.id === 'scanBtn'){ document.getElementById('scanInput')?.click(); return; }
+  if (t.id === 'saveBtn'){ handleSave(); return; }
+  if (t.id === 'removeOwnPhoto'){ state.form.ownPhotoDataUrl = null; state.form.chosenPhoto = 'source'; render(); return; }
+  if (t.id === 'addCatBtn'){
+    const input = document.getElementById('newCatInput');
+    const name = input?.value;
+    if (!name || !name.trim()){ alert('Enter a category name.'); return; }
+    createCategory(name);
+    input.value = '';
+    return;
   }
 
   const tab = t.closest('[data-tab]');
-  if (tab){
-    const key = tab.dataset.tab;
-    if (key === 'add' && state.view !== 'add'){ state.form = newForm(); state.editingId = null; state.extractStatus = null; }
-    if (key === 'list'){ state.categoryFilter = null; }
-    state.view = key; render(); return;
+  if (tab){ state.view = tab.dataset.tab; render(); return; }
+
+  const textSizeBtn = t.closest('[data-textsize]');
+  if (textSizeBtn){
+    const size = textSizeBtn.dataset.textsize;
+    state.textSize = size;
+    saveTextSize(size);
+    return;
   }
+
+  const back = t.closest('[data-back]');
+  if (back){ const v = back.dataset.back; if (v === 'list'){ goList(); }else{ state.view = v; render(); } return; }
+
+  const photoOpt = t.closest('[data-choosephoto]');
+  if (photoOpt){ state.form.chosenPhoto = photoOpt.dataset.choosephoto; render(); return; }
+
+  const switchPhoto = t.closest('[data-switchphoto]');
+  if (switchPhoto){ state.detail.chosenPhoto = switchPhoto.dataset.switchphoto; render(); return; }
 
   const filterBtn = t.closest('[data-filter]');
   if (filterBtn){ state.filter = filterBtn.dataset.filter; render(); return; }
 
+  // BUG FIX #5: Check toggleplan BEFORE open to prevent accidental opens
   const togglePlan = t.closest('[data-toggleplan]');
   if (togglePlan){ toggleMealPlan(togglePlan.dataset.toggleplan); return; }
 
@@ -1208,56 +1247,27 @@ document.addEventListener('click', async (e) => {
   if (groceryToggle){
     if (!window.__groceryChecked) window.__groceryChecked = new Set();
     const idx = groceryToggle.dataset.groceryToggle;
-    if (window.__groceryChecked.has(idx)) window.__groceryChecked.delete(idx); else window.__groceryChecked.add(idx);
-    render(); return;
+    if (window.__groceryChecked.has(idx)){ window.__groceryChecked.delete(idx); }else{ window.__groceryChecked.add(idx); }
+    render();
+    return;
   }
 
-  const backBtn = t.closest('[data-back]');
-  if (backBtn){
-    const target = backBtn.dataset.back;
-    if (target === 'mealplan'){ state.view = 'mealplan'; render(); return; }
-    goList(); return;
+  if (t.id === 'changeNameBtn'){
+    const val = prompt('Your first name', state.profile.name);
+    if (val && val.trim()){ state.profile.name = val.trim(); saveProfile(state.profile); registerInRoster(state.profile.name); render(); }
+    return;
   }
 
-  if (t.id === 'extractBtn' || t.closest('#extractBtn')){ handleExtract(); return; }
-  if (t.id === 'pasteExtractBtn' || t.closest('#pasteExtractBtn')){ handlePasteExtract(); return; }
-  if (t.id === 'saveBtn'){ handleSave(); return; }
-
-  if (t.id === 'sortToggle'){ state.sort = state.sort === 'az' ? 'new' : 'az'; saveSort(state.sort); render(); return; }
-
-  const sizeBtn = t.closest('[data-textsize]');
-  if (sizeBtn){
-    state.textSize = sizeBtn.dataset.textsize;
-    saveTextSize(state.textSize);
-    document.documentElement.setAttribute('data-textsize', state.textSize);
-    render(); return;
+  if (t.id === 'shareAppBtn'){
+    const url = window.location.href.split('?')[0];
+    try{ await navigator.clipboard.writeText(url); t.textContent='Copied ✓'; setTimeout(()=>{t.textContent='Copy app link';},1500); }
+    catch(e){ prompt('Copy this link:', url); }
+    return;
   }
 
-  if (t.id === 'addCatBtn'){
-    const val = document.getElementById('newCatInput').value;
-    await createCategory(val);
-    render(); return;
-  }
-
-  const removeUserBtn = t.closest('[data-remove-user]');
-  if (removeUserBtn){ removeUser(removeUserBtn.dataset.removeUser); return; }
-
-  const choosePhoto = t.closest('[data-choosephoto]');
-  if (choosePhoto){ state.form.chosenPhoto = choosePhoto.dataset.choosephoto; render(); return; }
-
-  const switchPhoto = t.closest('[data-switchphoto]');
-  if (switchPhoto){
-    const choice = switchPhoto.dataset.switchphoto;
-    state.detail.chosenPhoto = choice;
-    try{ await setDoc(doc(db, 'recipes', state.detail.id), { chosenPhoto: choice }, { merge: true }); }
-    catch(e){ console.error(e); }
-    render(); return;
-  }
-
-  if (t.id === 'removeOwnPhoto'){
-    state.form.ownPhotoDataUrl = null;
-    if (state.form.chosenPhoto === 'own') state.form.chosenPhoto = 'source';
-    render(); return;
+  if (t.id === 'closeShareBtn' || t.id === 'modalBg'){
+    if (t.id === 'modalBg' && e.target !== t) return;
+    state.shareModal = null; render(); return;
   }
 
   if (t.closest('[data-action="edit"]')){
@@ -1268,31 +1278,8 @@ document.addEventListener('click', async (e) => {
   if (t.closest('[data-action="delete"]')){ handleDelete(); return; }
   if (t.closest('[data-action="share"]')){ openShareForDetail(); return; }
 
-  if (t.id === 'changeNameBtn'){
-    const val = prompt('Your first name', state.profile.name);
-    if (val && val.trim()){ state.profile.name = val.trim(); saveProfile(state.profile); registerInRoster(state.profile.name); render(); }
-    return;
-  }
-
-  if (t.id === 'copyLinkBtn'){
-    const url = window.location.href.split('?')[0];
-    try{ await navigator.clipboard.writeText(url); t.textContent='Copied ✓'; setTimeout(()=>{t.textContent='Copy this link';},1500); }
-    catch(e){ prompt('Copy this link:', url); }
-    return;
-  }
-
-  if (t.id === 'copyShareBtn'){
-    const ta = document.getElementById('shareText');
-    ta.select(); ta.setSelectionRange(0, 999999);
-    try{ await navigator.clipboard.writeText(ta.value); }catch(err){ try{ document.execCommand('copy'); }catch(e2){} }
-    t.textContent = 'Copied ✓';
-    setTimeout(()=>{ t.textContent='Copy text'; }, 1500);
-    return;
-  }
-  if (t.id === 'closeShareBtn' || t.id === 'modalBg'){
-    if (t.id === 'modalBg' && e.target !== t) return;
-    state.shareModal = null; render(); return;
-  }
+  const removeUserBtn = t.closest('[data-remove-user]');
+  if (removeUserBtn){ removeUser(removeUserBtn.dataset.removeUser); return; }
 });
 
 document.addEventListener('change', async (e) => {
@@ -1319,6 +1306,7 @@ document.addEventListener('change', async (e) => {
   }
 });
 
+// BUG FIX #1-4: Sync form inputs to state on EVERY change to prevent data loss
 document.addEventListener('input', (e) => {
   if (e.target.id === 'nameInput'){
     document.getElementById('startBtn').disabled = !e.target.value.trim();
@@ -1327,9 +1315,18 @@ document.addEventListener('input', (e) => {
     state.query = e.target.value;
     render();
   }
-  if (e.target.id === 'titleInput'){ state.form.title = e.target.value; }
-  if (e.target.id === 'ingInput'){ state.form.ingredientsText = e.target.value; }
-  if (e.target.id === 'stepInput'){ state.form.instructionsText = e.target.value; }
+  if (e.target.id === 'titleInput'){ 
+    state.form.title = e.target.value;
+    e.stopPropagation();
+  }
+  if (e.target.id === 'ingInput'){ 
+    state.form.ingredientsText = e.target.value;
+    e.stopPropagation();
+  }
+  if (e.target.id === 'stepInput'){ 
+    state.form.instructionsText = e.target.value;
+    e.stopPropagation();
+  }
 });
 
 document.addEventListener('keydown', (e) => {
