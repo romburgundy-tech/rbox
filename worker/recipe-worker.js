@@ -3,7 +3,7 @@
 // Why this exists: the web app can't safely call the Anthropic API directly
 // from the browser, because that would expose your API key to anyone who
 // opens the page's source. This Worker holds the key as a secret on
-// Cloudflare's servers and exposes two small endpoints the app calls instead.
+// Cloudflare's servers and exposes small endpoints the app calls instead.
 //
 // Deploy: see README.md. In short —
 //   1. workers.cloudflare.com → Create a Worker → paste this file in.
@@ -87,16 +87,32 @@ ${text.slice(0, 8000)}`;
         return json(result, 200, corsHeaders);
       }
 
+      // BUG FIX #6: Improved /aggregate-grocery endpoint with better prompt
       if (url.pathname === "/aggregate-grocery" && request.method === "POST") {
         const { items } = await request.json();
         if (!Array.isArray(items) || !items.length) return json({ items: [] }, 200, corsHeaders);
 
-        const prompt = `Combine this shopping list from multiple recipes into one clean grocery list. Sum quantities for the same ingredient when units match or convert simply (e.g. "2 onions" + "1 onion" = "3 onions"; "1 cup flour" + "2 cups flour" = "3 cups flour"; 3 tsp = 1 tbsp). Keep items separate only when they truly can't be combined. Respond with ONLY valid JSON, no commentary:
-{"items": [{"text": "combined line with quantity", "sources": ["Recipe A", "Recipe B"]}, ...]}
-Sort alphabetically by ingredient name.
+        // BUG FIX: Better formatting of items for Claude to aggregate
+        const itemsList = items
+          .map(item => `${item.text}${item.from ? ` (from ${item.from})` : ''}`)
+          .join('\n');
 
-LIST:
-${JSON.stringify(items)}`;
+        const prompt = `You are a grocery list aggregator. Combine this shopping list from multiple recipes into one clean grocery list.
+
+Rules:
+- Sum quantities for the same ingredient when units match or convert simply
+  - "2 onions" + "1 onion" = "3 onions"
+  - "1 cup flour" + "2 cups flour" = "3 cups flour"
+  - "3 tsp = 1 tbsp", "16 tbsp = 1 cup" etc.
+- Keep items separate only when they truly can't be combined
+- Sort alphabetically by ingredient name
+- For each item, include all source recipes in the "sources" array
+
+Respond with ONLY valid JSON and nothing else — no markdown fences, no commentary. Schema:
+{"items": [{"text": "combined line with quantity", "sources": ["Recipe A", "Recipe B"]}, ...]}
+
+SHOPPING LIST:
+${itemsList}`;
 
         const result = await callClaude(env.ANTHROPIC_API_KEY, [{ role: "user", content: prompt }], true);
         return json(result, 200, corsHeaders);
@@ -123,6 +139,7 @@ Each ingredient should be one line including quantity where legible. Each instru
 
       return json({ error: "Not found" }, 404, corsHeaders);
     } catch (err) {
+      console.error("Worker error:", err);
       return json({ error: err.message || "Server error" }, 500, corsHeaders);
     }
   },
