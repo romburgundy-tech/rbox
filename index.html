@@ -374,6 +374,20 @@ function render(){
    re-render no matter which screen they're on. Once they blur/tab away, the
    next Firestore update renders normally. */
 function shouldRenderOnFirestoreUpdate(){
+  // Never let a background Firestore update touch the DOM while the user is
+  // on the add/edit recipe screen. This has to be a blanket rule for the
+  // whole screen, not just "is a field currently focused" — because opening
+  // the native photo/camera picker hands control to the OS and blurs the
+  // whole page (document.activeElement commonly reverts to <body> on mobile
+  // browsers while that's open), so a focus-only check can't reliably detect
+  // it. If a Firestore snapshot landed at that moment, the old check would
+  // wrongly allow a re-render, tearing out the file input mid-selection.
+  if (state.view === 'add') return false;
+
+  // For every other screen (the admin "reassign recipes" dropdown and the
+  // new-category field on Categories, for example), fall back to checking
+  // whether any input/textarea/select anywhere in the app currently has
+  // focus, and skip the re-render if so.
   const active = document.activeElement;
   const appEl = document.getElementById('app');
   const isEditingSomething = !!(active && appEl && appEl.contains(active) &&
@@ -981,11 +995,20 @@ async function handleSave(){
     instructions,
     category: f.category || 'Other',
     addedBy: f.addedBy || state.profile.name,
-    ...(state.editingId ? {} : { createdAt: new Date() })
+    // BUG FIX: previously this only set createdAt for NEW recipes and the
+    // save used { merge: !state.editingId } — which meant editing a recipe
+    // (merge:false) fully overwrote the document and dropped createdAt
+    // entirely. The live recipe list query uses orderBy('createdAt','desc'),
+    // and Firestore silently EXCLUDES any document missing that field from
+    // the results — so the edit would "save" with no error, then the recipe
+    // would vanish from every list. Now we always preserve the original
+    // createdAt on edit (falling back to now if it's somehow missing) and
+    // always merge, so no field is ever silently dropped.
+    createdAt: state.editingId ? ((state.detail && state.detail.createdAt) || new Date()) : new Date(),
   };
-  
+
   try{
-    await setDoc(doc(db, 'recipes', id), recipeDoc, { merge: !state.editingId });
+    await setDoc(doc(db, 'recipes', id), recipeDoc, { merge: true });
     state.saving = false;
     goList();
   }catch(e){
