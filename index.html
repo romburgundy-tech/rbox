@@ -483,24 +483,142 @@ async function extractFromText(text){
   return data;
 }
 
-// BUG FIX #6: Improved aggregateGroceryItems with better error handling
-async function aggregateGroceryItems(items){
-  const headers = Object.assign({'Content-Type':'application/json'}, await authHeader());
-  try {
-    const res = await fetch(WORKER_URL + '/aggregate-grocery', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ items })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Aggregation failed');
-    if (!data.items || !Array.isArray(data.items)) throw new Error('Invalid response format');
-    return data.items;
-  } catch (error) {
-    console.error('Aggregation error:', error);
-    // Re-throw to be caught by handleGenerateGrocery
-    throw error;
+/* ---- Grocery list aggregation (client-side, deterministic) ----
+   Previously this called the Worker's /aggregate-grocery endpoint, which
+   asked Claude to combine ingredient lines and return JSON. That worked
+   most of the time but was an unreliable dependency for something that's
+   fundamentally just arithmetic: it could fail on a transient network
+   error, an unexpected response shape, or the model occasionally not
+   returning clean JSON for longer lists — and every failure meant falling
+   back to an unaggregated list, which is the exact bug being reported
+   repeatedly. Replacing it with a plain parser removes that whole class of
+   failure: parsing "2 onions" into {qty:2, unit:null, name:'onion'} and
+   summing matching entries is entirely deterministic and needs no network
+   call, no auth token, and no LLM call to succeed. */
+
+const UNIT_ALIASES = {
+  cup:'cup', cups:'cup', c:'cup',
+  tablespoon:'tbsp', tablespoons:'tbsp', tbsp:'tbsp', tbsps:'tbsp', tbs:'tbsp',
+  teaspoon:'tsp', teaspoons:'tsp', tsp:'tsp', tsps:'tsp',
+  ounce:'oz', ounces:'oz', oz:'oz',
+  pound:'lb', pounds:'lb', lb:'lb', lbs:'lb',
+  gram:'g', grams:'g', g:'g',
+  kilogram:'kg', kilograms:'kg', kg:'kg',
+  milliliter:'ml', milliliters:'ml', ml:'ml',
+  liter:'l', liters:'l', l:'l',
+  pinch:'pinch', pinches:'pinch',
+  clove:'clove', cloves:'clove',
+  can:'can', cans:'can',
+  package:'pkg', packages:'pkg', pkg:'pkg',
+  slice:'slice', slices:'slice',
+  stick:'stick', sticks:'stick',
+  bunch:'bunch', bunches:'bunch',
+};
+// A few unit words are pluralized irregularly / stay the same either way.
+const UNIT_PLURAL = { cup:'cups', tbsp:'tbsp', tsp:'tsp', oz:'oz', lb:'lbs', g:'g', kg:'kg', ml:'ml', l:'l', pinch:'pinches', clove:'cloves', can:'cans', pkg:'pkg', slice:'slices', stick:'sticks', bunch:'bunches' };
+
+function parseQtyString(s){
+  s = s.trim();
+  if (s.includes('/')){
+    const parts = s.split(' ').filter(Boolean);
+    if (parts.length === 2){
+      const whole = parseFloat(parts[0]);
+      const [n,d] = parts[1].split('/').map(Number);
+      return whole + (d ? n/d : 0);
+    }
+    const [n,d] = s.split('/').map(Number);
+    return d ? n/d : parseFloat(s);
   }
+  return parseFloat(s);
+}
+
+function singularize(name){
+  let n = name.trim().toLowerCase().replace(/[.,;]+$/,'');
+  if (/[^aeiou]ies$/.test(n)) return n.replace(/ies$/, 'y');
+  if (/(oes|ses|xes|zes|ches|shes)$/.test(n)) return n.replace(/es$/, '');
+  if (/[^s]s$/.test(n) && n.length > 3) return n.replace(/s$/, '');
+  return n;
+}
+function pluralize(name, qty){
+  if (Math.abs(qty - 1) < 1e-9) return name;
+  if (/(s|x|z|ch|sh)$/.test(name)) return name + 'es';
+  if (/[^aeiou]y$/.test(name)) return name.slice(0, -1) + 'ies';
+  return name + 's';
+}
+
+// Parse one ingredient line into { qty, unit, name } or { qty:null } if it
+// doesn't start with a recognizable quantity (e.g. "Salt to taste").
+function parseIngredientLine(line){
+  const trimmed = line.trim();
+  const m = trimmed.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.\d+|\d+)\s*(.*)$/);
+  if (!m || !m[2]) return { qty: null, unit: null, name: trimmed };
+  const qty = parseQtyString(m[1]);
+  if (!isFinite(qty) || qty <= 0) return { qty: null, unit: null, name: trimmed };
+  let rest = m[2].trim();
+  let unit = null;
+  const unitMatch = rest.match(/^([a-zA-Z]+)\.?\s+(.*)$/);
+  if (unitMatch && UNIT_ALIASES[unitMatch[1].toLowerCase()]){
+    unit = UNIT_ALIASES[unitMatch[1].toLowerCase()];
+    rest = unitMatch[2];
+  }
+  const name = singularize(rest);
+  if (!name) return { qty: null, unit: null, name: trimmed };
+  return { qty, unit, name };
+}
+
+function formatQty(qty){
+  const rounded = Math.round(qty * 100) / 100;
+  const common = { 0.25:'1/4', 0.33:'1/3', 0.5:'1/2', 0.67:'2/3', 0.75:'3/4' };
+  const whole = Math.floor(rounded);
+  const frac = Math.round((rounded - whole) * 100) / 100;
+  if (frac === 0) return String(whole);
+  for (const [dec, str] of Object.entries(common)){
+    if (Math.abs(frac - Number(dec)) < 0.02){
+      return whole > 0 ? `${whole} ${str}` : str;
+    }
+  }
+  return String(Math.round(rounded * 100) / 100);
+}
+
+function aggregateGroceryItemsLocally(items){
+  const groups = {};
+  const order = [];
+  items.forEach(({text, from}) => {
+    const parsed = parseIngredientLine(text);
+    const key = parsed.qty == null
+      ? 'RAW::' + text.trim().toLowerCase()
+      : (parsed.unit || '') + '::' + parsed.name;
+    if (!groups[key]){
+      groups[key] = parsed.qty == null
+        ? { qty: null, raw: text.trim(), sources: [] }
+        : { qty: 0, unit: parsed.unit, name: parsed.name, sources: [] };
+      order.push(key);
+    }
+    if (parsed.qty != null) groups[key].qty += parsed.qty;
+    if (!groups[key].sources.includes(from)) groups[key].sources.push(from);
+  });
+
+  const results = order.map(key => {
+    const g = groups[key];
+    let text;
+    if (g.qty == null){
+      text = g.raw;
+    } else {
+      const qtyStr = formatQty(g.qty);
+      const isPlural = g.qty > 1.001 || g.qty < 0.999;
+      // Only pluralize the ingredient name itself for bare countable items
+      // ("2 onions"). When there's a measuring unit, the unit carries the
+      // plural and the noun stays singular ("3 cups flour", not "3 cups
+      // flours") — matches how ingredient lines are normally written.
+      const displayName = g.unit ? g.name : pluralize(g.name, g.qty);
+      const unitOut = g.unit ? (isPlural ? (UNIT_PLURAL[g.unit] || g.unit) : g.unit) : '';
+      text = `${qtyStr}${unitOut ? ' ' + unitOut : ''} ${displayName}`.trim();
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    return { text, sources: g.sources };
+  });
+
+  return results.sort((a,b) => a.text.localeCompare(b.text));
 }
 
 /* ---- Photo storage (Firebase Storage) ---- */
@@ -1086,25 +1204,23 @@ async function handleGenerateGrocery(){
   const lines = [];
   items.forEach(r => (r.ingredients||[]).forEach(i => lines.push({ text: i, from: r.title })));
   window.__groceryChecked = new Set();
-  
+
+  state.view = 'grocery';
+  state.groceryLoading = false;
+  state.groceryError = null;
+
   if (!lines.length){
     state.groceryItems = [];
-    state.groceryError = null;
-    state.view = 'grocery';
     render();
     return;
   }
-  
-  state.view = 'grocery';
-  state.groceryLoading = true;
-  state.groceryError = null;
-  render();
-  
+
   try{
-    state.groceryItems = await aggregateGroceryItems(lines);
+    state.groceryItems = aggregateGroceryItemsLocally(lines);
   }catch(e){
-    console.error('Aggregation error:', e);
-    // Fall back to a plain grouped (non-aggregated) list so the feature still works
+    // This should be effectively unreachable — parsing is pure string logic
+    // with no network dependency — but keep a safety net just in case.
+    console.error('Local aggregation error:', e);
     const grouped = {};
     lines.forEach(l => {
       const key = l.text.trim().toLowerCase();
@@ -1112,9 +1228,8 @@ async function handleGenerateGrocery(){
       if (!grouped[key].sources.includes(l.from)) grouped[key].sources.push(l.from);
     });
     state.groceryItems = Object.values(grouped).sort((a,b) => a.text.localeCompare(b.text));
-    state.groceryError = "Couldn't combine quantities automatically this time — showing items separately instead.";
+    state.groceryError = "Couldn't combine quantities this time — showing items separately instead.";
   }
-  state.groceryLoading = false;
   render();
 }
 
